@@ -1,0 +1,16 @@
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "test values.yaml",
+  "type": "object",
+  "properties": {
+    "numberValue": {
+      "type": "number",
+      "multipleOf": 10
+    },
+    "integerValue": {
+      "type": "integer",
+      "multipleOf": 20
+    }
+  }
+}

@@ -1,0 +1,12 @@
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "test values.yaml",
+  "type": "object",
+  "properties": {
+    "dateTimeValue": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

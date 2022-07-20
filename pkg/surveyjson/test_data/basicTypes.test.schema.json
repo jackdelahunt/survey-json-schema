@@ -1,0 +1,23 @@
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "test values.yaml",
+  "type": "object",
+  "properties": {
+    "nullValue": {
+      "type": "null"
+    },
+    "booleanValue": {
+      "type": "boolean"
+    },
+    "numberValue": {
+      "type": "number"
+    },
+    "stringValue": {
+      "type": "string"
+    },
+    "integerValue": {
+      "type": "integer"
+    }
+  }
+}

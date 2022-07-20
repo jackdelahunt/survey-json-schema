@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "test values.yaml",
+  "type": "object",
+  "properties": {
+    "nestedObject": {
+      "type": "object",
+      "properties": {
+        "enablePersistentStorage": {
+          "type": "boolean"
+        },
+        "nestedString": {
+          "type": "string"
+        }
+      },
+      "if": {
+        "properties": { "enablePersistentStorage": { "const": "true" } }
+      },
+      "then": {
+        "properties": { "databaseConnectionUrl": { "type": "string" },
+          "databaseUsername": { "type": "string"},
+          "databasePassword": { "type": "string", "format" : "password"} }
+      },
+      "else": {
+        "properties": { "enableInMemoryDB": { "type": "boolean", "default":  true} }
+      }
+    }
+  }
+}
