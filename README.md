@@ -21,6 +21,28 @@ askjschema --file=jsonschema.json
 
 ## Usage as library
 
+```go
+    import("github.com/wtrocki/survey-json-schema/pkg/surveyjson")
+
+    options := surveyjson.JSONSchemaOptions{
+        Out:                 os.Stdout,
+        In:                  os.Stdin,
+        OutErr:              os.Stderr,
+        AskExisting:         true,
+        AutoAcceptDefaults:  false,
+        NoAsk:               false,
+        IgnoreMissingValues: false,
+    }
+
+    yourSchema := ""
+    initialValues := make(map[string]interface{})
+    result, err := options.GenerateValues(yourSchema, initialValues)
+    if err != nil {
+        return err
+    }
+    fmt.Fprint(os.Stdin, string(result))
+```
+
 
 ## Features
 
