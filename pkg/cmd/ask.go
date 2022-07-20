@@ -18,7 +18,7 @@ var file string
 
 func NewAskCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "ask",
+		Use:     "askjschema",
 		Short:   "Ask a questions based on the provided json schema",
 		Long:    "Ask a questions based on the provided json schema",
 		Example: "app-services ask --schema-file schema.json --json-file data.json",
@@ -54,8 +54,10 @@ func NewAskCmd() *cobra.Command {
 				IgnoreMissingValues: false,
 			}
 			result, err := options.GenerateValues([]byte(b.String()), make(map[string]interface{}))
-
-			fmt.Fprintf(os.Stdin, string(result))
+			if err != nil {
+				return err
+			}
+			fmt.Fprint(os.Stdin, string(result))
 			return nil
 		},
 	}
