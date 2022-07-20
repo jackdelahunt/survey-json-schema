@@ -14,16 +14,37 @@ Library can be used to build interactive mode for tools like Cobra (<https://git
 
 ## Usage as CLI
 
+To showcase how library works it provides an CLI that does accept JSON schema as file input.
+
+To run cli with your local json schema execute
+
 ```bash
 go get github.com/wtrocki/survey-json-schema
 askjschema --file=jsonschema.json
 ```
 
+You can also use remote json schema
+
+```bash
+ askjschema --file https://raw.githubusercontent.com/wtrocki/survey-json-schema/main/pkg/surveyjson/test_data/basicTypes.test.schema.json
+```
+
+ CLI binary files are also available from Github releases.
+
 ## Usage as library
+
+Add library to dependencies
+
+```bash
+go get github.com/wtrocki/survey-json-schema
+```
+
+Add this sample code to your cobra handler method
 
 ```go
     import("github.com/wtrocki/survey-json-schema/pkg/surveyjson")
 
+    // Creates JSONSchema based of
     options := surveyjson.JSONSchemaOptions{
         Out:                 os.Stdout,
         In:                  os.Stdin,
@@ -43,6 +64,7 @@ askjschema --file=jsonschema.json
     fmt.Fprint(os.Stdin, string(result))
 ```
 
+For fully functional example see [pkg/cmd/ask.go](pkg/cmd/ask.go) file
 
 ## Features
 
