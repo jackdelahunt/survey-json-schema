@@ -57,6 +57,7 @@ func NewAskCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			fmt.Fprint(os.Stderr, "Provided Answers:\n"))
 			fmt.Fprint(os.Stdin, string(result))
 			return nil
 		},
