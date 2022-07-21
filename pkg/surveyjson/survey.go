@@ -187,9 +187,6 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 			return err
 		}
 	case "object":
-		if t.AdditionalProperties != nil {
-			return fmt.Errorf("additionalProperties is not supported for %s", name)
-		}
 		if len(t.PatternProperties) > 0 {
 			return fmt.Errorf("patternProperties is not supported for %s", name)
 		}
