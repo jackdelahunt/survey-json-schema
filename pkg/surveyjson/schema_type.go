@@ -30,7 +30,7 @@ type JSONSchemaType struct {
 	Required             []string                   `json:"required,omitempty"`
 	Properties           *Properties                `json:"properties,omitempty"`
 	PatternProperties    map[string]*JSONSchemaType `json:"patternProperties,omitempty"`
-	AdditionalProperties *JSONSchemaType            `json:"additionalProperties,omitempty"`
+	AdditionalProperties *interface{}               `json:"additionalProperties,omitempty"`
 	Dependencies         map[string]Dependency      `json:"dependencies,omitempty"`
 	PropertyNames        *JSONSchemaType            `json:"propertyNames,omitempty"`
 	Enum                 []interface{}              `json:"enum,omitempty"`
