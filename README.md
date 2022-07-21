@@ -7,8 +7,8 @@ Library for building interactive terminal inputs by using JSON schema.
 ## How this works
 
 Library can be used to build interactive mode for golang terminal applications like Cobra (<https://github.com/spf13/cobra>) etc.
-Library uses JSON schema as specification for questions and survey go library to execute them (<https://github.com/AlecAivazis/survey>)
-As result developers will get JSON files containing answers from the user that conform to specified JSON schema. 
+Library uses JSON schema as specification for questions and survey go library to execute them (<https://github.com/AlecAivazis/survey>).
+Developers will get JSON files containing answers from the user that conform to specified JSON schema. 
 
 In typical execution library will:
 
@@ -19,8 +19,7 @@ In typical execution library will:
 
 ## Usage as CLI
 
-To showcase how library works it provides an CLI that does accept JSON schema as file input.
-
+Project provides an CLI that reads JSON schema as file input.
 To run cli with your local json schema execute
 
 ```bash
@@ -93,3 +92,7 @@ For example:
 ```bash
 SURVEY_VALUE_USER_AGE=3
 ```
+
+## Source
+
+Library is basing on JSONSchema processor code originally contributed by Pete Muir for JenkinsX project.
