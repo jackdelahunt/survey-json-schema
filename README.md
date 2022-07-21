@@ -92,3 +92,7 @@ For example:
 ```bash
 SURVEY_VALUE_USER_AGE=3
 ```
+
+## Source
+
+Library is basing on JSONSchema processor code originally contributed by Pete Muir for JenkinsX project.
