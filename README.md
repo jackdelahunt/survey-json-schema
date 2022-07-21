@@ -7,8 +7,8 @@ Library for building interactive terminal inputs by using JSON schema.
 ## How this works
 
 Library can be used to build interactive mode for golang terminal applications like Cobra (<https://github.com/spf13/cobra>) etc.
-Library uses JSON schema as specification for questions and survey go library to execute them (<https://github.com/AlecAivazis/survey>)
-As result developers will get JSON files containing answers from the user that conform to specified JSON schema. 
+Library uses JSON schema as specification for questions and survey go library to execute them (<https://github.com/AlecAivazis/survey>).
+Developers will get JSON files containing answers from the user that conform to specified JSON schema. 
 
 In typical execution library will:
 
