@@ -19,8 +19,7 @@ In typical execution library will:
 
 ## Usage as CLI
 
-To showcase how library works it provides an CLI that does accept JSON schema as file input.
-
+Project provides an CLI that reads JSON schema as file input.
 To run cli with your local json schema execute
 
 ```bash
