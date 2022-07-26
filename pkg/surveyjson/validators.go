@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/pkg/errors"
 	"github.com/wtrocki/survey-json-schema/pkg/surveyjson/util"
 
@@ -46,6 +47,11 @@ func EnumValidator(enum []interface{}) survey.Validator {
 	return func(val interface{}) error {
 		if len(enum) > 0 {
 			found := false
+			enumMap, ok := val.(core.OptionAnswer)
+			if ok {
+				val = enumMap.Value
+			}
+
 			for _, e := range enum {
 				if e == val {
 					found = true
