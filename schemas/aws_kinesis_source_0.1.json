@@ -1,0 +1,197 @@
+{
+  "$defs": {
+    "data_shape": {
+      "consumes": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/octet-stream",
+            "enum": [
+              "application/octet-stream"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      },
+      "produces": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/octet-stream",
+            "enum": [
+              "application/octet-stream"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      }
+    },
+    "error_handler": {
+      "dead_letter_queue": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "The name of the Kafka topic used as dead letter queue",
+            "title": "Dead Letter Topic Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "log": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "stop": {
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "aws_access_key": {
+      "oneOf": [
+        {
+          "description": "The access key obtained from AWS",
+          "format": "password",
+          "title": "Access Key",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the aws_access_key",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Access Key",
+      "x-group": "credentials"
+    },
+    "aws_delay": {
+      "default": 500,
+      "description": "Milliseconds before the next poll of the selected stream",
+      "title": "Delay",
+      "type": "integer"
+    },
+    "aws_override_endpoint": {
+      "default": false,
+      "description": "Set the need for overiding the endpoint URI. This option needs to be used in combination with uriEndpointOverride setting.",
+      "title": "Endpoint Overwrite",
+      "type": "boolean"
+    },
+    "aws_region": {
+      "description": "The AWS region to connect to",
+      "example": "eu-west-1",
+      "title": "AWS Region",
+      "type": "string"
+    },
+    "aws_secret_key": {
+      "oneOf": [
+        {
+          "description": "The secret key obtained from AWS",
+          "format": "password",
+          "title": "Secret Key",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the aws_secret_key",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Secret Key",
+      "x-group": "credentials"
+    },
+    "aws_stream": {
+      "description": "The Kinesis stream that you want to access (needs to be created in advance)",
+      "title": "Stream Name",
+      "type": "string"
+    },
+    "aws_uri_endpoint_override": {
+      "description": "Set the overriding endpoint URI. This option needs to be used in combination with overrideEndpoint option.",
+      "title": "Overwrite Endpoint URI",
+      "type": "string"
+    },
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
+        },
+        "produces": {
+          "$ref": "#/$defs/data_shape/produces"
+        }
+      },
+      "type": "object"
+    },
+    "error_handler": {
+      "default": {
+        "stop": {}
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "log": {
+              "$ref": "#/$defs/error_handler/log"
+            }
+          },
+          "required": [
+            "log"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "stop": {
+              "$ref": "#/$defs/error_handler/stop"
+            }
+          },
+          "required": [
+            "stop"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dead_letter_queue": {
+              "$ref": "#/$defs/error_handler/dead_letter_queue"
+            }
+          },
+          "required": [
+            "dead_letter_queue"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "kafka_topic": {
+      "description": "Comma separated list of Kafka topic names",
+      "title": "Topic Names",
+      "type": "string"
+    },
+    "processors": {}
+  },
+  "required": [
+    "aws_stream",
+    "aws_region",
+    "kafka_topic",
+    "aws_access_key",
+    "aws_secret_key"
+  ],
+  "type": "object"
+}

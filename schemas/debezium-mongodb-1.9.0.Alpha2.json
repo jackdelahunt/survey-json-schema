@@ -1,0 +1,177 @@
+{
+  "$defs": {
+    "serializer": {
+      "default": "JSON",
+      "enum": [
+        "JSON",
+        "JSON without schema"
+      ],
+      "type": "string"
+    }
+  },
+  "additionalProperties": true,
+  "properties": {
+    "collection.exclude.list": {
+      "description": "A comma-separated list of regular expressions that match the collection names for which changes are to be excluded",
+      "type": "string",
+      "x-category": "FILTERS",
+      "x-name": "collection.exclude.list"
+    },
+    "collection.include.list": {
+      "description": "A comma-separated list of regular expressions that match the collection names for which changes are to be captured",
+      "format": "list,regex",
+      "title": "Include Collections",
+      "type": "string",
+      "x-category": "FILTERS",
+      "x-name": "collection.include.list"
+    },
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/serializer",
+          "description": "The serialization format for the Kafka message key.",
+          "title": "Kafka Message Key Format",
+          "x-category": "CONNECTOR",
+          "x-name": "data_shape.key"
+        },
+        "value": {
+          "$ref": "#/$defs/serializer",
+          "description": "The serialization format for the Kafka message value.",
+          "title": "Kafka Message Value Format",
+          "x-category": "CONNECTOR",
+          "x-name": "data_shape.value"
+        }
+      },
+      "type": "object"
+    },
+    "database.exclude.list": {
+      "description": "A comma-separated list of regular expressions that match the database names for which changes are to be excluded",
+      "format": "list,regex",
+      "title": "Exclude Databases",
+      "type": "string",
+      "x-category": "FILTERS",
+      "x-name": "database.exclude.list"
+    },
+    "database.include.list": {
+      "description": "A comma-separated list of regular expressions that match the database names for which changes are to be captured",
+      "format": "list,regex",
+      "title": "Include Databases",
+      "type": "string",
+      "x-category": "FILTERS",
+      "x-name": "database.include.list"
+    },
+    "field.exclude.list": {
+      "description": "A comma-separated list of the fully-qualified names of fields that should be excluded from change event message values",
+      "title": "Exclude Fields",
+      "type": "string",
+      "x-category": "FILTERS",
+      "x-name": "field.exclude.list"
+    },
+    "max.batch.size": {
+      "default": 2048,
+      "description": "Maximum size of each batch of source records. Defaults to 2048.",
+      "format": "int32",
+      "title": "Change event batch size",
+      "type": "integer",
+      "x-category": "ADVANCED",
+      "x-name": "max.batch.size"
+    },
+    "max.queue.size": {
+      "default": 8192,
+      "description": "Maximum size of the queue for change events read from the database log but not yet recorded or forwarded. Defaults to 8192, and should always be larger than the maximum batch size.",
+      "format": "int32",
+      "title": "Change event buffer size",
+      "type": "integer",
+      "x-category": "ADVANCED",
+      "x-name": "max.queue.size"
+    },
+    "mongodb.authsource": {
+      "default": "admin",
+      "description": "Database containing user credentials.",
+      "title": "Credentials Database",
+      "type": "string",
+      "x-category": "CONNECTION_ADVANCED",
+      "x-name": "mongodb.authsource"
+    },
+    "mongodb.hosts": {
+      "description": "The hostname and port pairs (in the form 'host' or 'host:port') of the MongoDB server(s) in the replica set.",
+      "format": "list,regex",
+      "title": "Hosts",
+      "type": "string",
+      "x-category": "CONNECTION",
+      "x-name": "mongodb.hosts"
+    },
+    "mongodb.name": {
+      "description": "Unique name that identifies the MongoDB replica set or cluster and all recorded offsets, and that is used as a prefix for all schemas and topics. Each distinct MongoDB installation should have a separate namespace and monitored by at most one Debezium connector.",
+      "nullable": false,
+      "title": "Namespace",
+      "type": "string",
+      "x-category": "CONNECTION",
+      "x-name": "mongodb.name"
+    },
+    "mongodb.password": {
+      "description": "Password to be used when connecting to MongoDB, if necessary.",
+      "oneOf": [
+        {
+          "description": "Password of the database user to be used when connecting to the database.",
+          "format": "password",
+          "type": "string"
+        },
+        {
+          "additionalProperties": true,
+          "description": "An opaque reference to the password.",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Password",
+      "x-category": "CONNECTION",
+      "x-name": "mongodb.password"
+    },
+    "mongodb.ssl.enabled": {
+      "default": false,
+      "description": "Should connector use SSL to connect to MongoDB instances",
+      "title": "Enable SSL connection to MongoDB",
+      "type": "boolean",
+      "x-category": "CONNECTION_ADVANCED_SSL",
+      "x-name": "mongodb.ssl.enabled"
+    },
+    "mongodb.user": {
+      "description": "Database user for connecting to MongoDB, if necessary.",
+      "title": "User",
+      "type": "string",
+      "x-category": "CONNECTION",
+      "x-name": "mongodb.user"
+    },
+    "query.fetch.size": {
+      "default": 0,
+      "description": "The maximum number of records that should be loaded into memory while streaming.  A value of `0` uses the default JDBC fetch size.",
+      "format": "int32",
+      "title": "Query fetch size",
+      "type": "integer",
+      "x-category": "ADVANCED",
+      "x-name": "query.fetch.size"
+    },
+    "snapshot.mode": {
+      "default": "initial",
+      "description": "The criteria for running a snapshot upon startup of the connector. Options include: 'initial' (the default) to specify the connector should always perform an initial sync when required; 'never' to specify the connector should never perform an initial sync ",
+      "enum": [
+        "never",
+        "initial"
+      ],
+      "title": "Snapshot mode",
+      "type": "string",
+      "x-category": "CONNECTOR_SNAPSHOT",
+      "x-name": "snapshot.mode"
+    }
+  },
+  "required": [
+    "mongodb.name"
+  ],
+  "title": "Debezium MongoDB Connector",
+  "type": "object",
+  "x-className": "io.debezium.connector.mongodb.MongoDbConnector",
+  "x-connector-id": "mongodb",
+  "x-version": "1.9.0.Alpha2"
+}

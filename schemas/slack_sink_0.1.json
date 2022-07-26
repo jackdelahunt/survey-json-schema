@@ -1,0 +1,152 @@
+{
+  "$defs": {
+    "data_shape": {
+      "consumes": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/octet-stream",
+            "enum": [
+              "application/octet-stream"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      }
+    },
+    "error_handler": {
+      "dead_letter_queue": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "The name of the Kafka topic used as dead letter queue",
+            "title": "Dead Letter Topic Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "log": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "stop": {
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
+        }
+      },
+      "type": "object"
+    },
+    "error_handler": {
+      "default": {
+        "stop": {}
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "log": {
+              "$ref": "#/$defs/error_handler/log"
+            }
+          },
+          "required": [
+            "log"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "stop": {
+              "$ref": "#/$defs/error_handler/stop"
+            }
+          },
+          "required": [
+            "stop"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dead_letter_queue": {
+              "$ref": "#/$defs/error_handler/dead_letter_queue"
+            }
+          },
+          "required": [
+            "dead_letter_queue"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "kafka_topic": {
+      "description": "Comma separated list of Kafka topic names",
+      "title": "Topic Names",
+      "type": "string"
+    },
+    "processors": {},
+    "slack_channel": {
+      "description": "The Slack channel to send messages to.",
+      "example": "#myroom",
+      "title": "Channel",
+      "type": "string"
+    },
+    "slack_icon_emoji": {
+      "description": "Use a Slack emoji as an avatar.",
+      "title": "Icon Emoji",
+      "type": "string"
+    },
+    "slack_icon_url": {
+      "description": "The avatar that the component will use when sending message to a channel or user.",
+      "title": "Icon URL",
+      "type": "string"
+    },
+    "slack_username": {
+      "description": "This is the username that the bot will have when sending messages to a channel or user.",
+      "title": "Username",
+      "type": "string"
+    },
+    "slack_webhook_url": {
+      "oneOf": [
+        {
+          "description": "The webhook URL used by the Slack channel to handle incoming messages.",
+          "format": "password",
+          "title": "Webhook URL",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the slack_webhook_url",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Webhook URL",
+      "x-group": "credentials"
+    }
+  },
+  "required": [
+    "slack_channel",
+    "slack_webhook_url",
+    "kafka_topic"
+  ],
+  "type": "object"
+}

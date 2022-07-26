@@ -1,0 +1,163 @@
+{
+  "$defs": {
+    "data_shape": {
+      "consumes": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/json",
+            "enum": [
+              "application/json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      }
+    },
+    "error_handler": {
+      "dead_letter_queue": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "The name of the Kafka topic used as dead letter queue",
+            "title": "Dead Letter Topic Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "log": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "stop": {
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
+        }
+      },
+      "type": "object"
+    },
+    "error_handler": {
+      "default": {
+        "stop": {}
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "log": {
+              "$ref": "#/$defs/error_handler/log"
+            }
+          },
+          "required": [
+            "log"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "stop": {
+              "$ref": "#/$defs/error_handler/stop"
+            }
+          },
+          "required": [
+            "stop"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dead_letter_queue": {
+              "$ref": "#/$defs/error_handler/dead_letter_queue"
+            }
+          },
+          "required": [
+            "dead_letter_queue"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "kafka_topic": {
+      "description": "Comma separated list of Kafka topic names",
+      "title": "Topic Names",
+      "type": "string"
+    },
+    "processors": {},
+    "sql_database_name": {
+      "description": "The Database Name we are pointing",
+      "title": "Database Name",
+      "type": "string"
+    },
+    "sql_password": {
+      "oneOf": [
+        {
+          "description": "The password to use for accessing a secured AWS Redshift Database",
+          "format": "password",
+          "title": "Password",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the sql_password",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Password",
+      "x-group": "credentials"
+    },
+    "sql_query": {
+      "description": "The Query to execute against the AWS Redshift Database",
+      "example": "INSERT INTO accounts (username,city) VALUES (:#username,:#city)",
+      "title": "Query",
+      "type": "string"
+    },
+    "sql_server_name": {
+      "description": "Server Name for the data source",
+      "example": "localhost",
+      "title": "Server Name",
+      "type": "string"
+    },
+    "sql_server_port": {
+      "default": 5439,
+      "description": "Server Port for the data source",
+      "title": "Server Port",
+      "type": "string"
+    },
+    "sql_username": {
+      "description": "The username to use for accessing a secured AWS Redshift Database",
+      "title": "Username",
+      "type": "string",
+      "x-group": "credentials"
+    }
+  },
+  "required": [
+    "sql_server_name",
+    "sql_username",
+    "sql_password",
+    "sql_query",
+    "sql_database_name",
+    "kafka_topic"
+  ],
+  "type": "object"
+}

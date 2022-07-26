@@ -1,0 +1,168 @@
+{
+  "$defs": {
+    "data_shape": {
+      "consumes": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/octet-stream",
+            "enum": [
+              "application/octet-stream"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      }
+    },
+    "error_handler": {
+      "dead_letter_queue": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "The name of the Kafka topic used as dead letter queue",
+            "title": "Dead Letter Topic Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "log": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "stop": {
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
+        }
+      },
+      "type": "object"
+    },
+    "error_handler": {
+      "default": {
+        "stop": {}
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "log": {
+              "$ref": "#/$defs/error_handler/log"
+            }
+          },
+          "required": [
+            "log"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "stop": {
+              "$ref": "#/$defs/error_handler/stop"
+            }
+          },
+          "required": [
+            "stop"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dead_letter_queue": {
+              "$ref": "#/$defs/error_handler/dead_letter_queue"
+            }
+          },
+          "required": [
+            "dead_letter_queue"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "ftps_connection_host": {
+      "description": "Hostname of the FTP server",
+      "title": "Connection Host",
+      "type": "string"
+    },
+    "ftps_connection_port": {
+      "default": 21,
+      "description": "Port of the FTP server",
+      "title": "Connection Port",
+      "type": "string"
+    },
+    "ftps_directory_name": {
+      "description": "The starting directory",
+      "title": "Directory Name",
+      "type": "string"
+    },
+    "ftps_file_exist": {
+      "default": "Override",
+      "description": "How to behave in case of file already existent. There are 4 enums and the value can be one of Override, Append, Fail or Ignore",
+      "title": "File Existence",
+      "type": "string"
+    },
+    "ftps_passive_mode": {
+      "default": false,
+      "description": "Sets passive mode connection",
+      "title": "Passive Mode",
+      "type": "boolean"
+    },
+    "ftps_password": {
+      "oneOf": [
+        {
+          "description": "The password to access the FTP server",
+          "format": "password",
+          "title": "Password",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the ftps_password",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Password",
+      "x-group": "credentials"
+    },
+    "ftps_username": {
+      "description": "The username to access the FTP server",
+      "title": "Username",
+      "type": "string",
+      "x-group": "credentials"
+    },
+    "kafka_topic": {
+      "description": "Comma separated list of Kafka topic names",
+      "title": "Topic Names",
+      "type": "string"
+    },
+    "processors": {}
+  },
+  "required": [
+    "ftps_connection_host",
+    "ftps_connection_port",
+    "ftps_username",
+    "ftps_password",
+    "ftps_directory_name",
+    "kafka_topic"
+  ],
+  "type": "object"
+}

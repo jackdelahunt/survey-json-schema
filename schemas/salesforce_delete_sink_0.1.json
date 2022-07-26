@@ -1,0 +1,168 @@
+{
+  "$defs": {
+    "data_shape": {
+      "consumes": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/json",
+            "enum": [
+              "application/json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      }
+    },
+    "error_handler": {
+      "dead_letter_queue": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "The name of the Kafka topic used as dead letter queue",
+            "title": "Dead Letter Topic Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "log": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "stop": {
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
+        }
+      },
+      "type": "object"
+    },
+    "error_handler": {
+      "default": {
+        "stop": {}
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "log": {
+              "$ref": "#/$defs/error_handler/log"
+            }
+          },
+          "required": [
+            "log"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "stop": {
+              "$ref": "#/$defs/error_handler/stop"
+            }
+          },
+          "required": [
+            "stop"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dead_letter_queue": {
+              "$ref": "#/$defs/error_handler/dead_letter_queue"
+            }
+          },
+          "required": [
+            "dead_letter_queue"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "kafka_topic": {
+      "description": "Comma separated list of Kafka topic names",
+      "title": "Topic Names",
+      "type": "string"
+    },
+    "processors": {},
+    "salesforce_client_id": {
+      "description": "The Salesforce application consumer key",
+      "title": "Consumer Key",
+      "type": "string",
+      "x-group": "credentials"
+    },
+    "salesforce_client_secret": {
+      "oneOf": [
+        {
+          "description": "The Salesforce application consumer secret",
+          "format": "password",
+          "title": "Consumer Secret",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the salesforce_client_secret",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Consumer Secret",
+      "x-group": "credentials"
+    },
+    "salesforce_login_url": {
+      "default": "https://login.salesforce.com",
+      "description": "The Salesforce instance login URL",
+      "title": "Login URL",
+      "type": "string"
+    },
+    "salesforce_password": {
+      "oneOf": [
+        {
+          "description": "The Salesforce user password",
+          "format": "password",
+          "title": "Password",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the salesforce_password",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Password",
+      "x-group": "credentials"
+    },
+    "salesforce_user_name": {
+      "description": "The Salesforce username",
+      "title": "Username",
+      "type": "string",
+      "x-group": "credentials"
+    }
+  },
+  "required": [
+    "salesforce_client_id",
+    "salesforce_client_secret",
+    "salesforce_user_name",
+    "salesforce_password",
+    "kafka_topic"
+  ],
+  "type": "object"
+}

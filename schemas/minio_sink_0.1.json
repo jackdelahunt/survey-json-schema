@@ -1,0 +1,167 @@
+{
+  "$defs": {
+    "data_shape": {
+      "consumes": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/octet-stream",
+            "enum": [
+              "application/octet-stream"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      }
+    },
+    "error_handler": {
+      "dead_letter_queue": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "The name of the Kafka topic used as dead letter queue",
+            "title": "Dead Letter Topic Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "log": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "stop": {
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
+        }
+      },
+      "type": "object"
+    },
+    "error_handler": {
+      "default": {
+        "stop": {}
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "log": {
+              "$ref": "#/$defs/error_handler/log"
+            }
+          },
+          "required": [
+            "log"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "stop": {
+              "$ref": "#/$defs/error_handler/stop"
+            }
+          },
+          "required": [
+            "stop"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dead_letter_queue": {
+              "$ref": "#/$defs/error_handler/dead_letter_queue"
+            }
+          },
+          "required": [
+            "dead_letter_queue"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "kafka_topic": {
+      "description": "Comma separated list of Kafka topic names",
+      "title": "Topic Names",
+      "type": "string"
+    },
+    "minio_access_key": {
+      "oneOf": [
+        {
+          "description": "The access key obtained from Minio",
+          "format": "password",
+          "title": "Access Key",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the minio_access_key",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Access Key",
+      "x-group": "credentials"
+    },
+    "minio_auto_create_bucket": {
+      "default": false,
+      "description": "Setting the autocreation of the Minio bucket bucketName.",
+      "title": "Autocreate Bucket",
+      "type": "boolean"
+    },
+    "minio_bucket_name": {
+      "description": "The Minio Bucket name",
+      "title": "Bucket Name",
+      "type": "string"
+    },
+    "minio_endpoint": {
+      "description": "The Minio Endpoint, it can be an URL, domain name, IPv4 address or IPv6 address.",
+      "example": "http://localhost:9000",
+      "title": "Endpoint",
+      "type": "string"
+    },
+    "minio_secret_key": {
+      "oneOf": [
+        {
+          "description": "The secret key obtained from Minio",
+          "format": "password",
+          "title": "Secret Key",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the minio_secret_key",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Secret Key",
+      "x-group": "credentials"
+    },
+    "processors": {}
+  },
+  "required": [
+    "minio_bucket_name",
+    "minio_access_key",
+    "minio_secret_key",
+    "minio_endpoint",
+    "kafka_topic"
+  ],
+  "type": "object"
+}

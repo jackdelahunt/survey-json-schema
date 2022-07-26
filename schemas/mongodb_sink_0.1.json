@@ -1,0 +1,164 @@
+{
+  "$defs": {
+    "data_shape": {
+      "consumes": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/json",
+            "enum": [
+              "application/json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      }
+    },
+    "error_handler": {
+      "dead_letter_queue": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "The name of the Kafka topic used as dead letter queue",
+            "title": "Dead Letter Topic Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "log": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "stop": {
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
+        }
+      },
+      "type": "object"
+    },
+    "error_handler": {
+      "default": {
+        "stop": {}
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "log": {
+              "$ref": "#/$defs/error_handler/log"
+            }
+          },
+          "required": [
+            "log"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "stop": {
+              "$ref": "#/$defs/error_handler/stop"
+            }
+          },
+          "required": [
+            "stop"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dead_letter_queue": {
+              "$ref": "#/$defs/error_handler/dead_letter_queue"
+            }
+          },
+          "required": [
+            "dead_letter_queue"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "kafka_topic": {
+      "description": "Comma separated list of Kafka topic names",
+      "title": "Topic Names",
+      "type": "string"
+    },
+    "mongodb_collection": {
+      "description": "Sets the name of the MongoDB collection to bind to this endpoint.",
+      "title": "MongoDB Collection",
+      "type": "string"
+    },
+    "mongodb_create_collection": {
+      "default": false,
+      "description": "Create collection during initialisation if it doesn't exist.",
+      "title": "Collection",
+      "type": "boolean"
+    },
+    "mongodb_database": {
+      "description": "Sets the name of the MongoDB database to target.",
+      "title": "MongoDB Database",
+      "type": "string"
+    },
+    "mongodb_hosts": {
+      "description": "Comma separated list of MongoDB Host Addresses in host:port format.",
+      "title": "MongoDB Hosts",
+      "type": "string"
+    },
+    "mongodb_password": {
+      "oneOf": [
+        {
+          "description": "User password for accessing MongoDB.",
+          "format": "password",
+          "title": "MongoDB Password",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the mongodb_password",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "MongoDB Password",
+      "x-group": "credentials"
+    },
+    "mongodb_username": {
+      "description": "Username for accessing MongoDB.",
+      "title": "MongoDB Username",
+      "type": "string",
+      "x-group": "credentials"
+    },
+    "mongodb_write_concern": {
+      "description": "Configure the level of acknowledgment requested from MongoDB for write operations, possible values are ACKNOWLEDGED, W1, W2, W3, UNACKNOWLEDGED, JOURNALED, MAJORITY.",
+      "title": "Write Concern",
+      "type": "string"
+    },
+    "processors": {}
+  },
+  "required": [
+    "mongodb_hosts",
+    "mongodb_collection",
+    "mongodb_database",
+    "kafka_topic"
+  ],
+  "type": "object"
+}

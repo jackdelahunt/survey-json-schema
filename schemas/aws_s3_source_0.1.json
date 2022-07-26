@@ -1,0 +1,243 @@
+{
+  "$defs": {
+    "data_shape": {
+      "produces": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/octet-stream",
+            "enum": [
+              "application/octet-stream"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      }
+    },
+    "error_handler": {
+      "dead_letter_queue": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "The name of the Kafka topic used as dead letter queue",
+            "title": "Dead Letter Topic Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "log": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "stop": {
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "aws_access_key": {
+      "oneOf": [
+        {
+          "description": "The access key obtained from AWS",
+          "format": "password",
+          "title": "Access Key",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the aws_access_key",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Access Key",
+      "x-group": "credentials"
+    },
+    "aws_auto_create_bucket": {
+      "default": false,
+      "description": "Setting the autocreation of the S3 bucket bucketName.",
+      "title": "Autocreate Bucket",
+      "type": "boolean"
+    },
+    "aws_bucket_name_or_arn": {
+      "description": "The S3 Bucket name or ARN",
+      "title": "Bucket Name",
+      "type": "string"
+    },
+    "aws_delay": {
+      "default": 500,
+      "description": "Milliseconds before the next poll of the selected bucket",
+      "title": "Delay",
+      "type": "integer"
+    },
+    "aws_delete_after_read": {
+      "default": true,
+      "description": "Delete objects after consuming them",
+      "title": "Auto-delete Objects",
+      "type": "boolean"
+    },
+    "aws_ignore_body": {
+      "default": false,
+      "description": "If it is true, the S3 Object Body will be ignored completely, if it is set to false the S3 Object will be put in the body. Setting this to true, will override any behavior defined by includeBody option.",
+      "title": "Ignore Body",
+      "type": "boolean"
+    },
+    "aws_include_body": {
+      "default": true,
+      "description": "If it is true, the exchange will be consumed and put into the body and closed. If false the S3Object stream will be put raw into the body and the headers will be set with the S3 object metadata.",
+      "title": "Include Body",
+      "type": "boolean"
+    },
+    "aws_override_endpoint": {
+      "default": false,
+      "description": "Set the need for overiding the endpoint URI. This option needs to be used in combination with uriEndpointOverride setting.",
+      "title": "Endpoint Overwrite",
+      "type": "boolean"
+    },
+    "aws_prefix": {
+      "description": "The AWS S3 bucket prefix to consider while searching",
+      "example": "folder/",
+      "title": "Prefix",
+      "type": "string"
+    },
+    "aws_region": {
+      "description": "The AWS region to connect to",
+      "enum": [
+        "af-south-1",
+        "ap-east-1",
+        "ap-northeast-1",
+        "ap-northeast-2",
+        "ap-northeast-3",
+        "ap-south-1",
+        "ap-southeast-1",
+        "ap-southeast-2",
+        "ap-southeast-3",
+        "ca-central-1",
+        "eu-central-1",
+        "eu-north-1",
+        "eu-south-1",
+        "eu-west-1",
+        "eu-west-2",
+        "eu-west-3",
+        "fips-us-east-1",
+        "fips-us-east-2",
+        "fips-us-west-1",
+        "fips-us-west-2",
+        "me-south-1",
+        "sa-east-1",
+        "us-east-1",
+        "us-east-2",
+        "us-west-1",
+        "us-west-2",
+        "cn-north-1",
+        "cn-northwest-1",
+        "us-gov-east-1",
+        "us-gov-west-1",
+        "us-iso-east-1",
+        "us-iso-west-1",
+        "us-isob-east-1"
+      ],
+      "example": "eu-west-1",
+      "title": "AWS Region",
+      "type": "string"
+    },
+    "aws_secret_key": {
+      "oneOf": [
+        {
+          "description": "The secret key obtained from AWS",
+          "format": "password",
+          "title": "Secret Key",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the aws_secret_key",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Secret Key",
+      "x-group": "credentials"
+    },
+    "aws_uri_endpoint_override": {
+      "description": "Set the overriding endpoint URI. This option needs to be used in combination with overrideEndpoint option.",
+      "title": "Overwrite Endpoint URI",
+      "type": "string"
+    },
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "produces": {
+          "$ref": "#/$defs/data_shape/produces"
+        }
+      },
+      "type": "object"
+    },
+    "error_handler": {
+      "default": {
+        "stop": {}
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "log": {
+              "$ref": "#/$defs/error_handler/log"
+            }
+          },
+          "required": [
+            "log"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "stop": {
+              "$ref": "#/$defs/error_handler/stop"
+            }
+          },
+          "required": [
+            "stop"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dead_letter_queue": {
+              "$ref": "#/$defs/error_handler/dead_letter_queue"
+            }
+          },
+          "required": [
+            "dead_letter_queue"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "kafka_topic": {
+      "description": "Comma separated list of Kafka topic names",
+      "title": "Topic Names",
+      "type": "string"
+    },
+    "processors": {}
+  },
+  "required": [
+    "aws_bucket_name_or_arn",
+    "aws_region",
+    "kafka_topic",
+    "aws_access_key",
+    "aws_secret_key"
+  ],
+  "type": "object"
+}
