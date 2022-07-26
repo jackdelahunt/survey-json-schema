@@ -1,0 +1,196 @@
+{
+  "$defs": {
+    "serializer": {
+      "default": "JSON",
+      "enum": [
+        "JSON",
+        "JSON without schema"
+      ],
+      "type": "string"
+    }
+  },
+  "additionalProperties": true,
+  "properties": {
+    "column.exclude.list": {
+      "description": "Regular expressions matching columns to exclude from change events",
+      "format": "list,regex",
+      "title": "Exclude Columns",
+      "type": "string",
+      "x-category": "FILTERS",
+      "x-name": "column.exclude.list"
+    },
+    "column.include.list": {
+      "description": "Regular expressions matching columns to include in change events",
+      "format": "list,regex",
+      "title": "Include Columns",
+      "type": "string",
+      "x-category": "FILTERS",
+      "x-name": "column.include.list"
+    },
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/serializer",
+          "description": "The serialization format for the Kafka message key.",
+          "title": "Kafka Message Key Format",
+          "x-category": "CONNECTOR",
+          "x-name": "data_shape.key"
+        },
+        "value": {
+          "$ref": "#/$defs/serializer",
+          "description": "The serialization format for the Kafka message value.",
+          "title": "Kafka Message Value Format",
+          "x-category": "CONNECTOR",
+          "x-name": "data_shape.value"
+        }
+      },
+      "type": "object"
+    },
+    "database.dbname": {
+      "description": "The name of the database from which the connector should capture changes",
+      "nullable": false,
+      "title": "Database",
+      "type": "string",
+      "x-category": "CONNECTION",
+      "x-name": "database.dbname"
+    },
+    "database.hostname": {
+      "description": "Resolvable hostname or IP address of the database server.",
+      "nullable": false,
+      "title": "Hostname",
+      "type": "string",
+      "x-category": "CONNECTION",
+      "x-name": "database.hostname"
+    },
+    "database.password": {
+      "description": "Password of the database user to be used when connecting to the database.",
+      "oneOf": [
+        {
+          "description": "Password of the database user to be used when connecting to the database.",
+          "format": "password",
+          "type": "string"
+        },
+        {
+          "additionalProperties": true,
+          "description": "An opaque reference to the password.",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Password",
+      "x-category": "CONNECTION",
+      "x-name": "database.password"
+    },
+    "database.port": {
+      "default": 1433,
+      "description": "Port of the database server.",
+      "format": "int32",
+      "title": "Port",
+      "type": "integer",
+      "x-category": "CONNECTION",
+      "x-name": "database.port"
+    },
+    "database.server.name": {
+      "description": "Unique name that identifies the database server and all recorded offsets, and that is used as a prefix for all schemas and topics. Each distinct installation should have a separate namespace and be monitored by at most one Debezium connector.",
+      "nullable": false,
+      "title": "Namespace",
+      "type": "string",
+      "x-category": "CONNECTION",
+      "x-name": "database.server.name"
+    },
+    "database.user": {
+      "description": "Name of the database user to be used when connecting to the database.",
+      "title": "User",
+      "type": "string",
+      "x-category": "CONNECTION",
+      "x-name": "database.user"
+    },
+    "decimal.handling.mode": {
+      "default": "precise",
+      "description": "Specify how DECIMAL and NUMERIC columns should be represented in change events, including:'precise' (the default) uses java.math.BigDecimal to represent values, which are encoded in the change events using a binary representation and Kafka Connect's 'org.apache.kafka.connect.data.Decimal' type; 'string' uses string to represent values; 'double' represents values using Java's 'double', which may not offer the precision but will be far easier to use in consumers.",
+      "enum": [
+        "string",
+        "double",
+        "precise"
+      ],
+      "title": "Decimal Handling",
+      "type": "string",
+      "x-category": "CONNECTOR",
+      "x-name": "decimal.handling.mode"
+    },
+    "max.batch.size": {
+      "default": 2048,
+      "description": "Maximum size of each batch of source records. Defaults to 2048.",
+      "format": "int32",
+      "title": "Change event batch size",
+      "type": "integer",
+      "x-category": "ADVANCED",
+      "x-name": "max.batch.size"
+    },
+    "max.queue.size": {
+      "default": 8192,
+      "description": "Maximum size of the queue for change events read from the database log but not yet recorded or forwarded. Defaults to 8192, and should always be larger than the maximum batch size.",
+      "format": "int32",
+      "title": "Change event buffer size",
+      "type": "integer",
+      "x-category": "ADVANCED",
+      "x-name": "max.queue.size"
+    },
+    "message.key.columns": {
+      "description": "A semicolon-separated list of expressions that match fully-qualified tables and column(s) to be used as message key. Each expression must match the pattern '<fully-qualified table name>:<key columns>',where the table names could be defined as (DB_NAME.TABLE_NAME) or (SCHEMA_NAME.TABLE_NAME), depending on the specific connector,and the key columns are a comma-separated list of columns representing the custom key. For any table without an explicit key configuration the table's primary key column(s) will be used as message key.Example: dbserver1.inventory.orderlines:orderId,orderLineId;dbserver1.inventory.orders:id",
+      "title": "Columns PK mapping",
+      "type": "string",
+      "x-category": "CONNECTOR_ADVANCED",
+      "x-name": "message.key.columns"
+    },
+    "query.fetch.size": {
+      "default": 0,
+      "description": "The maximum number of records that should be loaded into memory while streaming.  A value of `0` uses the default JDBC fetch size.",
+      "format": "int32",
+      "title": "Query fetch size",
+      "type": "integer",
+      "x-category": "ADVANCED",
+      "x-name": "query.fetch.size"
+    },
+    "snapshot.mode": {
+      "default": "initial",
+      "description": "The criteria for running a snapshot upon startup of the connector. Options include: 'initial' (the default) to specify the connector should run a snapshot only when no offsets are available for the logical server name; 'schema_only' to specify the connector should run a snapshot of the schema when no offsets are available for the logical server name. ",
+      "enum": [
+        "initial_only",
+        "initial",
+        "schema_only"
+      ],
+      "title": "Snapshot mode",
+      "type": "string",
+      "x-category": "CONNECTOR_SNAPSHOT",
+      "x-name": "snapshot.mode"
+    },
+    "table.exclude.list": {
+      "description": "A comma-separated list of regular expressions that match the fully-qualified names of tables to be excluded from monitoring",
+      "format": "list,regex",
+      "title": "Exclude Tables",
+      "type": "string",
+      "x-category": "FILTERS",
+      "x-name": "table.exclude.list"
+    },
+    "table.include.list": {
+      "description": "The tables for which changes are to be captured",
+      "format": "list,regex",
+      "title": "Include Tables",
+      "type": "string",
+      "x-category": "FILTERS",
+      "x-name": "table.include.list"
+    }
+  },
+  "required": [
+    "database.server.name",
+    "database.dbname",
+    "database.hostname"
+  ],
+  "title": "Debezium SqlSever Connector",
+  "type": "object",
+  "x-className": "io.debezium.connector.sqlserver.SqlServerConnector",
+  "x-connector-id": "sqlserver",
+  "x-version": "1.9.3.Final"
+}

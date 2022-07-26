@@ -1,0 +1,161 @@
+{
+  "$defs": {
+    "data_shape": {
+      "consumes": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/json",
+            "enum": [
+              "application/json"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      }
+    },
+    "error_handler": {
+      "dead_letter_queue": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "The name of the Kafka topic used as dead letter queue",
+            "title": "Dead Letter Topic Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "log": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "stop": {
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "ansible_tower_basic_auth_password": {
+      "oneOf": [
+        {
+          "description": "Basic Authentication Password",
+          "format": "password",
+          "title": "Basic Authentication Password",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the ansible_tower_basic_auth_password",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Basic Authentication Password",
+      "x-group": "credentials"
+    },
+    "ansible_tower_basic_auth_username": {
+      "description": "Authentication Username",
+      "title": "Basic Authentication Username",
+      "type": "string",
+      "x-group": "credentials"
+    },
+    "ansible_tower_host": {
+      "description": "The Ansible Tower Host",
+      "title": "Ansible Tower Host",
+      "type": "string"
+    },
+    "ansible_tower_host_insecure": {
+      "default": false,
+      "description": "Set whether all server certificates should be trusted",
+      "title": "Set whether all server certificates should be trusted",
+      "type": "boolean"
+    },
+    "ansible_tower_host_verify": {
+      "default": true,
+      "description": "Set whether hostname verification is enabled",
+      "title": "Set whether hostname verification is enabled",
+      "type": "boolean"
+    },
+    "ansible_tower_job_template_id": {
+      "description": "The Job Template ID",
+      "title": "The Job Template ID",
+      "type": "string"
+    },
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
+        }
+      },
+      "type": "object"
+    },
+    "error_handler": {
+      "default": {
+        "stop": {}
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "log": {
+              "$ref": "#/$defs/error_handler/log"
+            }
+          },
+          "required": [
+            "log"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "stop": {
+              "$ref": "#/$defs/error_handler/stop"
+            }
+          },
+          "required": [
+            "stop"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dead_letter_queue": {
+              "$ref": "#/$defs/error_handler/dead_letter_queue"
+            }
+          },
+          "required": [
+            "dead_letter_queue"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "kafka_topic": {
+      "description": "Comma separated list of Kafka topic names",
+      "title": "Topic Names",
+      "type": "string"
+    },
+    "processors": {}
+  },
+  "required": [
+    "ansible_tower_host",
+    "ansible_tower_basic_auth_username",
+    "ansible_tower_basic_auth_password",
+    "ansible_tower_job_template_id",
+    "kafka_topic"
+  ],
+  "type": "object"
+}

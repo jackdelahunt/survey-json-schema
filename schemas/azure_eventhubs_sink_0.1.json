@@ -1,0 +1,149 @@
+{
+  "$defs": {
+    "data_shape": {
+      "consumes": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/octet-stream",
+            "enum": [
+              "application/octet-stream"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      }
+    },
+    "error_handler": {
+      "dead_letter_queue": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "The name of the Kafka topic used as dead letter queue",
+            "title": "Dead Letter Topic Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "log": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "stop": {
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "azure_eventhub_name": {
+      "description": "The eventhub name",
+      "title": "Eventhubs Name",
+      "type": "string"
+    },
+    "azure_namespace_name": {
+      "description": "The eventhubs namespace",
+      "title": "Eventhubs Namespace",
+      "type": "string"
+    },
+    "azure_shared_access_key": {
+      "oneOf": [
+        {
+          "description": "The key for EventHubs SAS key name",
+          "format": "password",
+          "title": "Share Access Key",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the azure_shared_access_key",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Share Access Key",
+      "x-group": "credentials"
+    },
+    "azure_shared_access_name": {
+      "description": "EventHubs SAS key name",
+      "title": "Share Access Name",
+      "type": "string",
+      "x-group": "credentials"
+    },
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
+        }
+      },
+      "type": "object"
+    },
+    "error_handler": {
+      "default": {
+        "stop": {}
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "log": {
+              "$ref": "#/$defs/error_handler/log"
+            }
+          },
+          "required": [
+            "log"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "stop": {
+              "$ref": "#/$defs/error_handler/stop"
+            }
+          },
+          "required": [
+            "stop"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dead_letter_queue": {
+              "$ref": "#/$defs/error_handler/dead_letter_queue"
+            }
+          },
+          "required": [
+            "dead_letter_queue"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "kafka_topic": {
+      "description": "Comma separated list of Kafka topic names",
+      "title": "Topic Names",
+      "type": "string"
+    },
+    "processors": {}
+  },
+  "required": [
+    "azure_namespace_name",
+    "azure_eventhub_name",
+    "azure_shared_access_name",
+    "azure_shared_access_key",
+    "kafka_topic"
+  ],
+  "type": "object"
+}

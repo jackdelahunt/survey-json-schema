@@ -1,0 +1,226 @@
+{
+  "$defs": {
+    "data_shape": {
+      "consumes": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/octet-stream",
+            "enum": [
+              "application/octet-stream"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      }
+    },
+    "error_handler": {
+      "dead_letter_queue": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "The name of the Kafka topic used as dead letter queue",
+            "title": "Dead Letter Topic Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "log": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "stop": {
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "aws_access_key": {
+      "oneOf": [
+        {
+          "description": "The access key obtained from AWS",
+          "format": "password",
+          "title": "Access Key",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the aws_access_key",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Access Key",
+      "x-group": "credentials"
+    },
+    "aws_amazon_a_w_s_host": {
+      "default": "amazonaws.com",
+      "description": "The hostname of the Amazon AWS cloud.",
+      "title": "AWS Host",
+      "type": "string"
+    },
+    "aws_auto_create_queue": {
+      "default": false,
+      "description": "Setting the autocreation of the SQS queue.",
+      "title": "Autocreate Queue",
+      "type": "boolean"
+    },
+    "aws_override_endpoint": {
+      "default": false,
+      "description": "Set the need for overiding the endpoint URI. This option needs to be used in combination with uriEndpointOverride setting.",
+      "title": "Endpoint Overwrite",
+      "type": "boolean"
+    },
+    "aws_protocol": {
+      "default": "https",
+      "description": "The underlying protocol used to communicate with SQS",
+      "example": "http or https",
+      "title": "Protocol",
+      "type": "string"
+    },
+    "aws_queue_name_or_arn": {
+      "description": "The SQS Queue name or ARN",
+      "title": "Queue Name",
+      "type": "string"
+    },
+    "aws_region": {
+      "description": "The AWS region to connect to",
+      "enum": [
+        "af-south-1",
+        "ap-east-1",
+        "ap-northeast-1",
+        "ap-northeast-2",
+        "ap-northeast-3",
+        "ap-south-1",
+        "ap-southeast-1",
+        "ap-southeast-2",
+        "ap-southeast-3",
+        "ca-central-1",
+        "eu-central-1",
+        "eu-north-1",
+        "eu-south-1",
+        "eu-west-1",
+        "eu-west-2",
+        "eu-west-3",
+        "fips-us-east-1",
+        "fips-us-east-2",
+        "fips-us-west-1",
+        "fips-us-west-2",
+        "me-south-1",
+        "sa-east-1",
+        "us-east-1",
+        "us-east-2",
+        "us-west-1",
+        "us-west-2",
+        "cn-north-1",
+        "cn-northwest-1",
+        "us-gov-east-1",
+        "us-gov-west-1",
+        "us-iso-east-1",
+        "us-iso-west-1",
+        "us-isob-east-1"
+      ],
+      "example": "eu-west-1",
+      "title": "AWS Region",
+      "type": "string"
+    },
+    "aws_secret_key": {
+      "oneOf": [
+        {
+          "description": "The secret key obtained from AWS",
+          "format": "password",
+          "title": "Secret Key",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the aws_secret_key",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Secret Key",
+      "x-group": "credentials"
+    },
+    "aws_uri_endpoint_override": {
+      "description": "Set the overriding endpoint URI. This option needs to be used in combination with overrideEndpoint option.",
+      "title": "Overwrite Endpoint URI",
+      "type": "string"
+    },
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
+        }
+      },
+      "type": "object"
+    },
+    "error_handler": {
+      "default": {
+        "stop": {}
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "log": {
+              "$ref": "#/$defs/error_handler/log"
+            }
+          },
+          "required": [
+            "log"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "stop": {
+              "$ref": "#/$defs/error_handler/stop"
+            }
+          },
+          "required": [
+            "stop"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dead_letter_queue": {
+              "$ref": "#/$defs/error_handler/dead_letter_queue"
+            }
+          },
+          "required": [
+            "dead_letter_queue"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "kafka_topic": {
+      "description": "Comma separated list of Kafka topic names",
+      "title": "Topic Names",
+      "type": "string"
+    },
+    "processors": {}
+  },
+  "required": [
+    "aws_queue_name_or_arn",
+    "aws_region",
+    "kafka_topic",
+    "aws_access_key",
+    "aws_secret_key"
+  ],
+  "type": "object"
+}

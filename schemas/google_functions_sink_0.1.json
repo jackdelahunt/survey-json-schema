@@ -1,0 +1,137 @@
+{
+  "$defs": {
+    "data_shape": {
+      "consumes": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "default": "application/octet-stream",
+            "enum": [
+              "application/octet-stream"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      }
+    },
+    "error_handler": {
+      "dead_letter_queue": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "The name of the Kafka topic used as dead letter queue",
+            "title": "Dead Letter Topic Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "log": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "stop": {
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "data_shape": {
+      "additionalProperties": false,
+      "properties": {
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
+        }
+      },
+      "type": "object"
+    },
+    "error_handler": {
+      "default": {
+        "stop": {}
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "log": {
+              "$ref": "#/$defs/error_handler/log"
+            }
+          },
+          "required": [
+            "log"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "stop": {
+              "$ref": "#/$defs/error_handler/stop"
+            }
+          },
+          "required": [
+            "stop"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dead_letter_queue": {
+              "$ref": "#/$defs/error_handler/dead_letter_queue"
+            }
+          },
+          "required": [
+            "dead_letter_queue"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "gcp_function_name": {
+      "description": "The Function Name",
+      "title": "Function Name",
+      "type": "string"
+    },
+    "gcp_project_id": {
+      "description": "The Google Cloud Functions Project Id",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "gcp_region": {
+      "description": "The Region where the Google Cloud Functions has been deployed",
+      "title": "Region",
+      "type": "string"
+    },
+    "gcp_service_account_key": {
+      "description": "The Service account key that can be used as credentials for the Google Cloud Functions platform",
+      "title": "Service Account Key",
+      "type": "string",
+      "x-group": "credentials"
+    },
+    "kafka_topic": {
+      "description": "Comma separated list of Kafka topic names",
+      "title": "Topic Names",
+      "type": "string"
+    },
+    "processors": {}
+  },
+  "required": [
+    "gcp_project_id",
+    "gcp_function_name",
+    "gcp_region",
+    "gcp_service_account_key",
+    "kafka_topic"
+  ],
+  "type": "object"
+}
