@@ -18,6 +18,10 @@ import (
 	"github.com/iancoleman/orderedmap"
 )
 
+const (
+	RefPathPrefix = "#/$defs/"
+)
+
 // JSONSchemaOptions are options for generating values from a schema
 type JSONSchemaOptions struct {
 	// If there are existingValues then those questions will be
@@ -42,7 +46,7 @@ func (o *JSONSchemaOptions) GenerateValues(schemaBytes []byte, existingValues ma
 		return nil, errors.Wrapf(err, "unmarshaling schema %s", schemaBytes)
 	}
 	output := orderedmap.New()
-	err = o.recurse("", make([]string, 0), make([]string, 0), &t, nil, output, make([]survey.Validator, 0), existingValues)
+	err = o.recurse("", make([]string, 0), make([]string, 0), &t, nil, output, make([]survey.Validator, 0), existingValues, make(map[string]*JSONSchemaType))
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -58,13 +62,13 @@ func (o *JSONSchemaOptions) GenerateValues(schemaBytes []byte, existingValues ma
 
 }
 
-func (o *JSONSchemaOptions) handleConditionals(prefixes []string, requiredFields []string, property string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap, existingValues map[string]interface{}) error {
+func (o *JSONSchemaOptions) handleConditionals(prefixes []string, requiredFields []string, property string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap, existingValues map[string]interface{}, definitions map[string]*JSONSchemaType) error {
 	if parentType != nil {
-		err := o.handleIf(prefixes, requiredFields, property, t, parentType, output, existingValues)
+		err := o.handleIf(prefixes, requiredFields, property, t, parentType, output, existingValues, definitions)
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		err = o.handleAllOf(prefixes, requiredFields, property, t, parentType, output, existingValues)
+		err = o.handleAllOf(prefixes, requiredFields, property, t, parentType, output, existingValues, definitions)
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -72,10 +76,10 @@ func (o *JSONSchemaOptions) handleConditionals(prefixes []string, requiredFields
 	return nil
 }
 
-func (o *JSONSchemaOptions) handleAllOf(prefixes []string, requiredFields []string, property string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap, existingValues map[string]interface{}) error {
+func (o *JSONSchemaOptions) handleAllOf(prefixes []string, requiredFields []string, property string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap, existingValues map[string]interface{}, definitions map[string]*JSONSchemaType) error {
 	if parentType.AllOf != nil && len(parentType.AllOf) > 0 {
 		for _, allType := range parentType.AllOf {
-			err := o.handleIf(prefixes, requiredFields, property, t, allType, output, existingValues)
+			err := o.handleIf(prefixes, requiredFields, property, t, allType, output, existingValues, definitions)
 			if err != nil {
 				return err
 			}
@@ -84,7 +88,7 @@ func (o *JSONSchemaOptions) handleAllOf(prefixes []string, requiredFields []stri
 	return nil
 }
 
-func (o *JSONSchemaOptions) handleIf(prefixes []string, requiredFields []string, propertyName string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap, existingValues map[string]interface{}) error {
+func (o *JSONSchemaOptions) handleIf(prefixes []string, requiredFields []string, propertyName string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap, existingValues map[string]interface{}, definitions map[string]*JSONSchemaType) error {
 	if parentType.If != nil {
 		if len(parentType.If.Properties.Keys()) > 1 {
 			return fmt.Errorf("Please specify a single property condition when using If in your schema")
@@ -122,7 +126,7 @@ func (o *JSONSchemaOptions) handleIf(prefixes []string, requiredFields []string,
 			if desiredState {
 				if parentType.Then != nil {
 					parentType.Then.Type = "object"
-					err := o.processThenElse(result, output, requiredFields, parentType.Then, parentType, existingValues)
+					err := o.processThenElse(result, output, requiredFields, parentType.Then, parentType, existingValues, definitions)
 					if err != nil {
 						return err
 					}
@@ -130,7 +134,7 @@ func (o *JSONSchemaOptions) handleIf(prefixes []string, requiredFields []string,
 			} else {
 				if parentType.Else != nil {
 					parentType.Else.Type = "object"
-					err := o.processThenElse(result, output, requiredFields, parentType.Else, parentType, existingValues)
+					err := o.processThenElse(result, output, requiredFields, parentType.Else, parentType, existingValues, definitions)
 					if err != nil {
 						return err
 					}
@@ -141,8 +145,8 @@ func (o *JSONSchemaOptions) handleIf(prefixes []string, requiredFields []string,
 	return nil
 }
 
-func (o *JSONSchemaOptions) processThenElse(result *orderedmap.OrderedMap, output *orderedmap.OrderedMap, requiredFields []string, conditionalType *JSONSchemaType, parentType *JSONSchemaType, existingValues map[string]interface{}) error {
-	err := o.recurse("", make([]string, 0), requiredFields, conditionalType, parentType, result, make([]survey.Validator, 0), existingValues)
+func (o *JSONSchemaOptions) processThenElse(result *orderedmap.OrderedMap, output *orderedmap.OrderedMap, requiredFields []string, conditionalType *JSONSchemaType, parentType *JSONSchemaType, existingValues map[string]interface{}, definitions map[string]*JSONSchemaType) error {
+	err := o.recurse("", make([]string, 0), requiredFields, conditionalType, parentType, result, make([]survey.Validator, 0), existingValues, definitions)
 	if err != nil {
 		return err
 	}
@@ -160,7 +164,7 @@ func (o *JSONSchemaOptions) processThenElse(result *orderedmap.OrderedMap, outpu
 }
 
 func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFields []string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap,
-	additionalValidators []survey.Validator, existingValues map[string]interface{}) error {
+	additionalValidators []survey.Validator, existingValues map[string]interface{}, definitions map[string]*JSONSchemaType) error {
 	required := util.Contains(requiredFields, name)
 	if name != "" {
 		prefixes = append(prefixes, name)
@@ -170,6 +174,13 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 	}
 	if t.ContentMediaType != nil {
 		return fmt.Errorf("contentMediaType is not supported for %s", name)
+	}
+
+	if len(t.Definitions) > 0 {
+		for key, schema := range t.Definitions {
+			// TODO duplicates
+			definitions[key] = schema
+		}
 	}
 
 	switch t.Type {
@@ -224,7 +235,7 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 							return errors.Wrapf(err, "converting key %s from %v to map[string]interface{}", name, existingValues)
 						}
 					}
-					err := o.recurse(n, prefixes, t.Required, property, t, result, duringValidators, nestedExistingValues)
+					err := o.recurse(n, prefixes, t.Required, property, t, result, duringValidators, nestedExistingValues, definitions)
 					if err != nil {
 						return err
 					}
@@ -328,8 +339,33 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 			return err
 		}
 	}
-	err := o.handleConditionals(prefixes, t.Required, name, t, parentType, output, existingValues)
+
+	if t.Ref != "" {
+		refPath, err := parseRefPath(t.Ref)
+		if err != nil {
+			return err
+		}
+
+		// TODO ref path would need to be traversed to get sub objects, assuming right now that all defs are one level deep
+		err = o.recurse(name, make([]string, 0), make([]string, 0), definitions[refPath[0]], nil, output, make([]survey.Validator, 0), existingValues, definitions)
+		if err != nil {
+			return err
+		}
+	}
+
+	err := o.handleConditionals(prefixes, t.Required, name, t, parentType, output, existingValues, definitions)
 	return err
+}
+
+func parseRefPath(path string) ([]string, error) {
+
+	if strings.HasPrefix(path, RefPathPrefix) {
+		path = strings.TrimPrefix(path, RefPathPrefix)
+	} else {
+		return nil, errors.New("Reference path must start with " + RefPathPrefix)
+	}
+
+	return strings.Split(path, "/"), nil
 }
 
 // According to the spec, "An instance validates successfully against this keyword if its value

@@ -53,6 +53,7 @@ func NewAskCmd() *cobra.Command {
 				NoAsk:               false,
 				IgnoreMissingValues: false,
 			}
+
 			result, err := options.GenerateValues([]byte(b.String()), make(map[string]interface{}))
 			if err != nil {
 				return err
