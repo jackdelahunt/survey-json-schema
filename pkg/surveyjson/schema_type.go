@@ -46,7 +46,8 @@ type JSONSchemaType struct {
 
 	Not *JSONSchemaType `json:"not,omitempty"`
 
-	Definitions Definitions `json:"definitions,omitempty"`
+	Definitions      Definitions `json:"$defs,omitempty"`
+	DefinitionsAlias Definitions `json:"definitions,omitempty"`
 
 	Contains         *JSONSchemaType `json:"contains,omitempty"`
 	Const            *interface{}    `json:"const,omitempty"`
