@@ -19,7 +19,8 @@ import (
 )
 
 const (
-	RefPathPrefix = "#/$defs/"
+	RefPathPrefixDefs        = "#/$defs/"
+	RefPathPrefixDefinitions = "#/definitions/"
 )
 
 // JSONSchemaOptions are options for generating values from a schema
@@ -178,7 +179,12 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 
 	if len(t.Definitions) > 0 {
 		for key, schema := range t.Definitions {
-			// TODO duplicates
+			definitions[key] = schema
+		}
+	}
+
+	if len(t.DefinitionsAlias) > 0 {
+		for key, schema := range t.DefinitionsAlias {
 			definitions[key] = schema
 		}
 	}
@@ -359,10 +365,12 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 
 func parseRefPath(path string) ([]string, error) {
 
-	if strings.HasPrefix(path, RefPathPrefix) {
-		path = strings.TrimPrefix(path, RefPathPrefix)
+	if strings.HasPrefix(path, RefPathPrefixDefs) {
+		path = strings.TrimPrefix(path, RefPathPrefixDefs)
+	} else if strings.HasPrefix(path, RefPathPrefixDefinitions) {
+		path = strings.TrimPrefix(path, RefPathPrefixDefinitions)
 	} else {
-		return nil, errors.New("Reference path must start with " + RefPathPrefix)
+		return nil, errors.New(fmt.Sprintf("Reference path must start with definition prefix: %v or %v", RefPathPrefixDefs, RefPathPrefixDefinitions))
 	}
 
 	return strings.Split(path, "/"), nil
