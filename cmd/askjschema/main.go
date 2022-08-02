@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/wtrocki/survey-json-schema/pkg/cmd"
+	"github.com/jackdelahunt/survey-json-schema/pkg/cmd"
 )
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/iancoleman/orderedmap"
-	"github.com/wtrocki/survey-json-schema/pkg/surveyjson/util"
+	"github.com/jackdelahunt/survey-json-schema/pkg/surveyjson/util"
 )
 
 // Based of https://www.ietf.org/archive/id/draft-handrews-json-schema-validation-01.txt

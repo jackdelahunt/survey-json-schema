@@ -1,4 +1,4 @@
-module github.com/wtrocki/survey-json-schema
+module github.com/jackdelahunt/survey-json-schema
 
 go 1.16
 
