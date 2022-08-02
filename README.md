@@ -23,7 +23,7 @@ Project provides an CLI that reads JSON schema as file input.
 To run cli with your local json schema execute
 
 ```bash
-go get github.com/wtrocki/survey-json-schema
+go get github.com/jackdelahunt/survey-json-schema
 askjschema --file=jsonschema.json
 ```
 
@@ -40,13 +40,13 @@ You can also use remote json schema
 Add library to dependencies
 
 ```bash
-go get github.com/wtrocki/survey-json-schema
+go get github.com/jackdelahunt/survey-json-schema
 ```
 
 Add this sample code to your cobra handler method
 
 ```go
-    import("github.com/wtrocki/survey-json-schema/pkg/surveyjson")
+    import("github.com/jackdelahunt/survey-json-schema/pkg/surveyjson")
 
     // Creates JSONSchema based of
     options := surveyjson.JSONSchemaOptions{
