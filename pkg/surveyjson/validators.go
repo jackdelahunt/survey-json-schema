@@ -13,7 +13,7 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/pkg/errors"
-	"github.com/wtrocki/survey-json-schema/pkg/surveyjson/util"
+	"github.com/jackdelahunt/survey-json-schema/pkg/surveyjson/util"
 
 	"github.com/iancoleman/orderedmap"
 )

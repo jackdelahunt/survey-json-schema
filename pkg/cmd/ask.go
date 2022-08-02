@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/wtrocki/survey-json-schema/pkg/surveyjson"
+	"github.com/jackdelahunt/survey-json-schema/pkg/surveyjson"
 )
 
 var file string
