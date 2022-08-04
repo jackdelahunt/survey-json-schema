@@ -258,7 +258,7 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 						valid = false
 					}
 				}
-				if valid {
+				if valid && len(result.Keys()) > 0 {
 					output.Set(name, result)
 				}
 			}
