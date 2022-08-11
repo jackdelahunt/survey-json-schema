@@ -352,40 +352,22 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 			return err
 		}
 
-		// if len(refPath) > 1 {
-		// 	// TODO handle nested refs
-		// 	nestedDefinition := definitions[refPath[0]]
-		// 	data, _ := json.Marshal(nestedDefinition)
-		// 	return fmt.Errorf("nested refs not supported yet", refPath[1], string(data))
-		// }
+		currentObject := (*definitions[refPath[0]]).(map[string]interface{})
+		for i := 1; i < len(refPath); i += 1 {
+			currentObject = (currentObject[refPath[i]]).(map[string]interface{})
+		}
 
 		var mainDefinition *JSONSchemaType
-		currentDefinition := definitions[refPath[0]]
-		if len(refPath) == 1 {
-			// TODO validate if cast works
-			mainDefinition = (*currentDefinition).(*JSONSchemaType)
-			if err != nil {
-				return err
-			}
 
-		} else if len(refPath) == 2 {
-			fmt.Println("Traversing nested path", refPath[1])
-			// Disclaimer this work for
-			nestedJson := (*currentDefinition).(map[string]interface{})
-			if err != nil {
-				return err
-			}
-			nestedDefinition := (nestedJson)[refPath[1]]
-			nestedJSON, err := json.Marshal(nestedDefinition)
-			fmt.Println("nestedJSON ", string(nestedJSON))
-			err = json.Unmarshal(nestedJSON, &mainDefinition)
-			if err != nil {
-				return err
-			}
-
+		nestedJSON, err := json.Marshal(currentObject)
+		if err != nil {
+			return err
 		}
-		fmt.Println("Finished ", mainDefinition.Properties)
-		// TODO support multilevel refpaths
+
+		err = json.Unmarshal(nestedJSON, &mainDefinition)
+		if err != nil {
+			return err
+		}
 
 		err = o.recurse(name, make([]string, 0), make([]string, 0), mainDefinition, nil, output, make([]survey.Validator, 0), existingValues, definitions)
 		if err != nil {
