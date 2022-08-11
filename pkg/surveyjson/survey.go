@@ -354,19 +354,24 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 
 		currentObject := (*definitions[refPath[0]]).(map[string]interface{})
 		for i := 1; i < len(refPath); i += 1 {
-			currentObject = (currentObject[refPath[i]]).(map[string]interface{})
+			object, ok := currentObject[refPath[i]]
+			if !ok {
+				return errors.New(fmt.Sprintf("Could not resolve ref path \"%v\" is not a key in the object", refPath[i]))
+			}
+
+			currentObject = object.(map[string]interface{})
 		}
 
 		var mainDefinition *JSONSchemaType
 
 		nestedJSON, err := json.Marshal(currentObject)
 		if err != nil {
-			return err
+			return errors.New(fmt.Sprintf("Cannot marshal to json object %v", currentObject))
 		}
 
 		err = json.Unmarshal(nestedJSON, &mainDefinition)
 		if err != nil {
-			return err
+			return errors.New(fmt.Sprintf("Cannot unmarshal json object to JsonSchemaObject %v", nestedJSON))
 		}
 
 		err = o.recurse(name, make([]string, 0), make([]string, 0), mainDefinition, nil, output, make([]survey.Validator, 0), existingValues, definitions)
