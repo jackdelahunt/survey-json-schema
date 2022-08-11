@@ -360,14 +360,27 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 		// }
 
 		var mainDefinition *JSONSchemaType
+		currentDefinition := definitions[refPath[0]]
 		if len(refPath) == 1 {
-			currentDefinition := definitions[refPath[0]]
+			// TODO validate if cast works
 			mainDefinition = (*currentDefinition).(*JSONSchemaType)
 			if err != nil {
 				return err
 			}
-		} else {
-			// TODO go through the nested refs to find the final definition
+
+		} else if len(refPath) == 2 {
+			// Disclaimer this work for
+			nestedJson := (*currentDefinition).(*map[string]*interface{})
+			if err != nil {
+				return err
+			}
+			nestedDefinition := (*nestedJson)[refPath[1]]
+			// TODO validate if cast works
+			mainDefinition = (*nestedDefinition).(*JSONSchemaType)
+			if err != nil {
+				return err
+			}
+
 		}
 
 		// TODO ref path would need to be traversed to get sub objects, assuming right now that all defs are one level deep
