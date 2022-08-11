@@ -369,21 +369,24 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 			}
 
 		} else if len(refPath) == 2 {
+			fmt.Println("Traversing nested path", refPath[1])
 			// Disclaimer this work for
-			nestedJson := (*currentDefinition).(*map[string]*interface{})
+			nestedJson := (*currentDefinition).(map[string]interface{})
 			if err != nil {
 				return err
 			}
-			nestedDefinition := (*nestedJson)[refPath[1]]
-			// TODO validate if cast works
-			mainDefinition = (*nestedDefinition).(*JSONSchemaType)
+			nestedDefinition := (nestedJson)[refPath[1]]
+			nestedJSON, err := json.Marshal(nestedDefinition)
+			fmt.Println("nestedJSON ", string(nestedJSON))
+			err = json.Unmarshal(nestedJSON, &mainDefinition)
 			if err != nil {
 				return err
 			}
 
 		}
+		fmt.Println("Finished ", mainDefinition.Properties)
+		// TODO support multilevel refpaths
 
-		// TODO ref path would need to be traversed to get sub objects, assuming right now that all defs are one level deep
 		err = o.recurse(name, make([]string, 0), make([]string, 0), mainDefinition, nil, output, make([]survey.Validator, 0), existingValues, definitions)
 		if err != nil {
 			return err
