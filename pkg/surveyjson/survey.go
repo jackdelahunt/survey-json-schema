@@ -47,7 +47,7 @@ func (o *JSONSchemaOptions) GenerateValues(schemaBytes []byte, existingValues ma
 		return nil, errors.Wrapf(err, "unmarshaling schema %s", schemaBytes)
 	}
 	output := orderedmap.New()
-	err = o.recurse("", make([]string, 0), make([]string, 0), &t, nil, output, make([]survey.Validator, 0), existingValues, make(map[string]*JSONSchemaType))
+	err = o.recurse("", make([]string, 0), make([]string, 0), &t, nil, output, make([]survey.Validator, 0), existingValues, make(map[string]*interface{}))
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -63,7 +63,7 @@ func (o *JSONSchemaOptions) GenerateValues(schemaBytes []byte, existingValues ma
 
 }
 
-func (o *JSONSchemaOptions) handleConditionals(prefixes []string, requiredFields []string, property string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap, existingValues map[string]interface{}, definitions map[string]*JSONSchemaType) error {
+func (o *JSONSchemaOptions) handleConditionals(prefixes []string, requiredFields []string, property string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap, existingValues map[string]interface{}, definitions map[string]*interface{}) error {
 	if parentType != nil {
 		err := o.handleIf(prefixes, requiredFields, property, t, parentType, output, existingValues, definitions)
 		if err != nil {
@@ -77,7 +77,7 @@ func (o *JSONSchemaOptions) handleConditionals(prefixes []string, requiredFields
 	return nil
 }
 
-func (o *JSONSchemaOptions) handleAllOf(prefixes []string, requiredFields []string, property string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap, existingValues map[string]interface{}, definitions map[string]*JSONSchemaType) error {
+func (o *JSONSchemaOptions) handleAllOf(prefixes []string, requiredFields []string, property string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap, existingValues map[string]interface{}, definitions map[string]*interface{}) error {
 	if parentType.AllOf != nil && len(parentType.AllOf) > 0 {
 		for _, allType := range parentType.AllOf {
 			err := o.handleIf(prefixes, requiredFields, property, t, allType, output, existingValues, definitions)
@@ -89,7 +89,7 @@ func (o *JSONSchemaOptions) handleAllOf(prefixes []string, requiredFields []stri
 	return nil
 }
 
-func (o *JSONSchemaOptions) handleIf(prefixes []string, requiredFields []string, propertyName string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap, existingValues map[string]interface{}, definitions map[string]*JSONSchemaType) error {
+func (o *JSONSchemaOptions) handleIf(prefixes []string, requiredFields []string, propertyName string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap, existingValues map[string]interface{}, definitions map[string]*interface{}) error {
 	if parentType.If != nil {
 		if len(parentType.If.Properties.Keys()) > 1 {
 			return fmt.Errorf("Please specify a single property condition when using If in your schema")
@@ -146,7 +146,7 @@ func (o *JSONSchemaOptions) handleIf(prefixes []string, requiredFields []string,
 	return nil
 }
 
-func (o *JSONSchemaOptions) processThenElse(result *orderedmap.OrderedMap, output *orderedmap.OrderedMap, requiredFields []string, conditionalType *JSONSchemaType, parentType *JSONSchemaType, existingValues map[string]interface{}, definitions map[string]*JSONSchemaType) error {
+func (o *JSONSchemaOptions) processThenElse(result *orderedmap.OrderedMap, output *orderedmap.OrderedMap, requiredFields []string, conditionalType *JSONSchemaType, parentType *JSONSchemaType, existingValues map[string]interface{}, definitions map[string]*interface{}) error {
 	err := o.recurse("", make([]string, 0), requiredFields, conditionalType, parentType, result, make([]survey.Validator, 0), existingValues, definitions)
 	if err != nil {
 		return err
@@ -165,7 +165,7 @@ func (o *JSONSchemaOptions) processThenElse(result *orderedmap.OrderedMap, outpu
 }
 
 func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFields []string, t *JSONSchemaType, parentType *JSONSchemaType, output *orderedmap.OrderedMap,
-	additionalValidators []survey.Validator, existingValues map[string]interface{}, definitions map[string]*JSONSchemaType) error {
+	additionalValidators []survey.Validator, existingValues map[string]interface{}, definitions map[string]*interface{}) error {
 	required := util.Contains(requiredFields, name)
 	if name != "" {
 		prefixes = append(prefixes, name)
@@ -352,8 +352,25 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 			return err
 		}
 
+		// if len(refPath) > 1 {
+		// 	// TODO handle nested refs
+		// 	nestedDefinition := definitions[refPath[0]]
+		// 	data, _ := json.Marshal(nestedDefinition)
+		// 	return fmt.Errorf("nested refs not supported yet", refPath[1], string(data))
+		// }
+
+		var mainDefinition *JSONSchemaType
+		if len(refPath) == 1 {
+			mainDefinition, err = util.AsJSONSchema(definitions[refPath[0]])
+			if err != nil {
+				return err
+			}
+		} else {
+			// TODO go through the nested refs to find the final definition
+		}
+
 		// TODO ref path would need to be traversed to get sub objects, assuming right now that all defs are one level deep
-		err = o.recurse(name, make([]string, 0), make([]string, 0), definitions[refPath[0]], nil, output, make([]survey.Validator, 0), existingValues, definitions)
+		err = o.recurse(name, make([]string, 0), make([]string, 0), mainDefinition, nil, output, make([]survey.Validator, 0), existingValues, definitions)
 		if err != nil {
 			return err
 		}

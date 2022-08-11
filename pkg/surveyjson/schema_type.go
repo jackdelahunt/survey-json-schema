@@ -60,7 +60,7 @@ type JSONSchemaType struct {
 }
 
 // Definitions hold schema definitions.
-type Definitions map[string]*JSONSchemaType
+type Definitions map[string]*interface{}
 
 // Dependency is either a Type or an array of strings, and so requires special unmarshaling from JSON
 type Dependency struct {
