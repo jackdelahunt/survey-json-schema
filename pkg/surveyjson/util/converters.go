@@ -68,7 +68,7 @@ func AsBool(unknown interface{}) (bool, error) {
 	return bv.Bool(), nil
 }
 
-//AsSliceOfStrings attempts to convert unknown to a slice of strings
+// AsSliceOfStrings attempts to convert unknown to a slice of strings
 func AsSliceOfStrings(unknown interface{}) ([]string, error) {
 	v := reflect.ValueOf(unknown)
 	v = reflect.Indirect(v)
@@ -82,7 +82,7 @@ func AsSliceOfStrings(unknown interface{}) ([]string, error) {
 	return result, nil
 }
 
-//AsMapOfStringsIntefaces attempts to convert unknown to a map[string]interface{}
+// AsMapOfStringsIntefaces attempts to convert unknown to a map[string]interface{}
 func AsMapOfStringsIntefaces(unknown interface{}) (map[string]interface{}, error) {
 	v := reflect.ValueOf(unknown)
 	v = reflect.Indirect(v)

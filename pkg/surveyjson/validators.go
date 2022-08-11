@@ -12,8 +12,8 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/AlecAivazis/survey/v2/core"
-	"github.com/pkg/errors"
 	"github.com/jackdelahunt/survey-json-schema/pkg/surveyjson/util"
+	"github.com/pkg/errors"
 
 	"github.com/iancoleman/orderedmap"
 )
@@ -237,7 +237,7 @@ func JSONPointerValidator() survey.Validator {
 	}
 }
 
-//FloatValidator validates that val is a float
+// FloatValidator validates that val is a float
 func FloatValidator() survey.Validator {
 	return func(val interface{}) error {
 		str, err := util.AsString(val)
@@ -252,7 +252,7 @@ func FloatValidator() survey.Validator {
 	}
 }
 
-//IntegerValidator validates that val is an int
+// IntegerValidator validates that val is an int
 func IntegerValidator() survey.Validator {
 	return func(val interface{}) error {
 		str, err := util.AsString(val)
@@ -267,7 +267,7 @@ func IntegerValidator() survey.Validator {
 	}
 }
 
-//BoolValidator validates that val is a bool
+// BoolValidator validates that val is a bool
 func BoolValidator() survey.Validator {
 	return func(val interface{}) error {
 		_, err := util.AsBool(val)
@@ -438,7 +438,7 @@ func MinPropertiesValidator(minItems *int, value *orderedmap.OrderedMap, key str
 	}
 }
 
-//UniqueItemsValidator validates that the val is unique in a slice
+// UniqueItemsValidator validates that the val is unique in a slice
 func UniqueItemsValidator(value []interface{}) survey.Validator {
 	return func(val interface{}) error {
 		set := make(map[interface{}]bool)
@@ -452,7 +452,7 @@ func UniqueItemsValidator(value []interface{}) survey.Validator {
 	}
 }
 
-//NoWhiteSpaceValidator is an input validator for the survey package that disallows any whitespace in the val
+// NoWhiteSpaceValidator is an input validator for the survey package that disallows any whitespace in the val
 func NoWhiteSpaceValidator() survey.Validator {
 	// return a validator that ensures the given string does not contain any whitespace
 	return func(val interface{}) error {
@@ -467,7 +467,7 @@ func NoWhiteSpaceValidator() survey.Validator {
 	}
 }
 
-//PatternValidator validates that the val matches the regex pattern
+// PatternValidator validates that the val matches the regex pattern
 func PatternValidator(pattern *string) survey.Validator {
 	return func(val interface{}) error {
 		if pattern != nil {

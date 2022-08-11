@@ -10,8 +10,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/jackdelahunt/survey-json-schema/pkg/surveyjson"
+	"github.com/spf13/cobra"
 )
 
 var file string
