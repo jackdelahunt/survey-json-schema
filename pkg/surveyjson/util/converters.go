@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
-	"github.com/wtrocki/survey-json-schema/pkg/surveyjson"
 )
 
 // Contains various type converters from unknown type to base types
@@ -15,7 +14,6 @@ var floatType = reflect.TypeOf(float64(0))
 var intType = reflect.TypeOf(int64(0))
 var stringType = reflect.TypeOf("")
 var boolType = reflect.TypeOf(false)
-var typeOfJsonSchema = reflect.TypeOf(surveyjson.JSONSchemaType)
 
 // AsFloat64 attempts to convert unknown to a float64
 func AsFloat64(unknown interface{}) (float64, error) {
@@ -26,16 +24,6 @@ func AsFloat64(unknown interface{}) (float64, error) {
 	}
 	fv := v.Convert(floatType)
 	return fv.Float(), nil
-}
-
-func AsJSONSchema(unknown interface{}) (surveyjson.JSONSchemaType, error) {
-	v := reflect.ValueOf(unknown)
-	v = reflect.Indirect(v)
-	if !v.Type().ConvertibleTo(typeOfJsonSchema) {
-		return 0, fmt.Errorf("cannot convert %v (%v) to float64", v.Type(), v)
-	}
-	fv := v.Convert(typeOfJsonSchema)
-	return fv, nil
 }
 
 // AsInt64 attempts to convert unknown to an int64

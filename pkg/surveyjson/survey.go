@@ -361,7 +361,8 @@ func (o *JSONSchemaOptions) recurse(name string, prefixes []string, requiredFiel
 
 		var mainDefinition *JSONSchemaType
 		if len(refPath) == 1 {
-			mainDefinition, err = util.AsJSONSchema(definitions[refPath[0]])
+			currentDefinition := definitions[refPath[0]]
+			mainDefinition = (*currentDefinition).(*JSONSchemaType)
 			if err != nil {
 				return err
 			}
