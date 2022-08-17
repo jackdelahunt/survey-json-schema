@@ -37,7 +37,7 @@ type JSONSchemaOptions struct {
 	In                  terminal.FileReader
 	Out                 terminal.FileWriter
 	OutErr              io.Writer
-	Overrides           map[string]func(ctx SchemaContext) error
+	Overrides           map[string]func(o *JSONSchemaOptions, ctx SchemaContext) error
 }
 
 type SchemaContext struct {
@@ -95,7 +95,7 @@ func (o *JSONSchemaOptions) GenerateValues(schemaBytes []byte, existingValues ma
 func (o *JSONSchemaOptions) Recurse(ctx SchemaContext) error {
 
 	if f, ok := o.Overrides[ctx.Name]; ok {
-		return f(ctx)
+		return f(o, ctx)
 	}
 
 	ctx.Required = util.Contains(ctx.RequiredFields, ctx.Name)
