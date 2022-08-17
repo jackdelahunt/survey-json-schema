@@ -37,6 +37,7 @@ type JSONSchemaOptions struct {
 	In                  terminal.FileReader
 	Out                 terminal.FileWriter
 	OutErr              io.Writer
+	Overrides           map[string]func(ctx SchemaContext) error
 }
 
 type SchemaContext struct {
@@ -49,6 +50,7 @@ type SchemaContext struct {
 	AdditionalValidators []survey.Validator
 	ExistingValues       map[string]interface{}
 	Definitions          *map[string]*interface{}
+	Required             bool
 }
 
 // GenerateValues examines the schema in schemaBytes, asks a series of questions using in, out and outErr,
@@ -71,9 +73,10 @@ func (o *JSONSchemaOptions) GenerateValues(schemaBytes []byte, existingValues ma
 		AdditionalValidators: make([]survey.Validator, 0),
 		ExistingValues:       existingValues,
 		Definitions:          &definitions,
+		Required:             false,
 	}
 
-	err = o.recurse(ctx)
+	err = o.Recurse(ctx)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -87,6 +90,306 @@ func (o *JSONSchemaOptions) GenerateValues(schemaBytes []byte, existingValues ma
 	}
 	return make([]byte, 0), fmt.Errorf("unable to find root element in %v", ctx.Output)
 
+}
+
+func (o *JSONSchemaOptions) Recurse(ctx SchemaContext) error {
+
+	if f, ok := o.Overrides[ctx.Name]; ok {
+		return f(ctx)
+	}
+
+	ctx.Required = util.Contains(ctx.RequiredFields, ctx.Name)
+	if ctx.Name != "" {
+		ctx.Prefixes = append(ctx.Prefixes, ctx.Name)
+	}
+	if ctx.SchemaType.ContentEncoding != nil {
+		return fmt.Errorf("contentEncoding is not supported for %s", ctx.Name)
+	}
+	if ctx.SchemaType.ContentMediaType != nil {
+		return fmt.Errorf("contentMediaType is not supported for %s", ctx.Name)
+	}
+
+	if len(ctx.SchemaType.Definitions) > 0 {
+		for key, schema := range ctx.SchemaType.Definitions {
+			(*ctx.Definitions)[key] = schema
+		}
+	}
+
+	if len(ctx.SchemaType.DefinitionsAlias) > 0 {
+		for key, schema := range ctx.SchemaType.DefinitionsAlias {
+			(*ctx.Definitions)[key] = schema
+		}
+	}
+
+	var err error
+
+	switch ctx.SchemaType.Type {
+	case "null":
+		err = o.RecurseNull(ctx)
+	case "boolean":
+		err = o.RecurseBoolean(ctx)
+	case "object":
+		err = o.RecurseObject(ctx)
+	case "array":
+		err = o.RecurseArray(ctx)
+	case "number":
+		err = o.RecurseNumber(ctx)
+	case "string":
+		err = o.RecurseString(ctx)
+	case "integer":
+		err = o.RecurseInteger(ctx)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	if ctx.SchemaType.Ref != "" {
+		refPath, err := parseRefPath(ctx.SchemaType.Ref)
+		if err != nil {
+			return err
+		}
+
+		currentObject := (*(*ctx.Definitions)[refPath[0]]).(map[string]interface{})
+		for i := 1; i < len(refPath); i += 1 {
+			object, ok := currentObject[refPath[i]]
+			if !ok {
+				return errors.New(fmt.Sprintf("Could not resolve ref path \"%v\" is not a key in the object", refPath[i]))
+			}
+
+			currentObject = object.(map[string]interface{})
+		}
+
+		var mainDefinition *JSONSchemaType
+
+		nestedJSON, err := json.Marshal(currentObject)
+		if err != nil {
+			return errors.New(fmt.Sprintf("Cannot marshal to json object %v", currentObject))
+		}
+
+		err = json.Unmarshal(nestedJSON, &mainDefinition)
+		if err != nil {
+			return errors.New(fmt.Sprintf("Cannot unmarshal json object to JsonSchemaObject %v", nestedJSON))
+		}
+
+		subContext := SchemaContext{
+			Name:                 ctx.Name,
+			Prefixes:             make([]string, 0),
+			RequiredFields:       make([]string, 0),
+			SchemaType:           mainDefinition,
+			ParentType:           nil,
+			Output:               ctx.Output,
+			AdditionalValidators: make([]survey.Validator, 0),
+			ExistingValues:       ctx.ExistingValues,
+			Definitions:          ctx.Definitions,
+		}
+		err = o.Recurse(subContext)
+		if err != nil {
+			return err
+		}
+	}
+
+	ctx.RequiredFields = ctx.SchemaType.Required
+	err = o.handleConditionals(ctx)
+	return err
+}
+
+func (o *JSONSchemaOptions) RecurseArray(ctx SchemaContext) error {
+	if ctx.SchemaType.Const != nil {
+		return fmt.Errorf("const is not supported for %s", ctx.Name)
+		// TODO support const
+	}
+	if ctx.SchemaType.Contains != nil {
+		return fmt.Errorf("contains is not supported for %s", ctx.Name)
+		// TODO support contains
+	}
+	if ctx.SchemaType.AdditionalItems != nil {
+		return fmt.Errorf("additionalItems is not supported for %s", ctx.Name)
+		// TODO support additonalItems
+	}
+	err := o.handleArrayProperty(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *JSONSchemaOptions) RecurseObject(ctx SchemaContext) error {
+	if len(ctx.SchemaType.PatternProperties) > 0 {
+		return fmt.Errorf("patternProperties is not supported for %s", ctx.Name)
+	}
+	if len(ctx.SchemaType.Dependencies) > 0 {
+		return fmt.Errorf("dependencies is not supported for %s", ctx.Name)
+	}
+	if ctx.SchemaType.PropertyNames != nil {
+		return fmt.Errorf("propertyNames is not supported for %s", ctx.Name)
+	}
+	if ctx.SchemaType.Const != nil {
+		return fmt.Errorf("const is not supported for %s", ctx.Name)
+		// TODO support const
+	}
+	if ctx.SchemaType.Properties != nil {
+		for valid := false; !valid; {
+			result := orderedmap.New()
+			duringValidators := make([]survey.Validator, 0)
+			postValidators := []survey.Validator{
+				// These validators are run after the processing of the properties
+				MinPropertiesValidator(ctx.SchemaType.MinProperties, result, ctx.Name),
+				EnumValidator(ctx.SchemaType.Enum),
+				MaxPropertiesValidator(ctx.SchemaType.MaxProperties, result, ctx.Name),
+			}
+			for _, n := range ctx.SchemaType.Properties.Keys() {
+				v, _ := ctx.SchemaType.Properties.Get(n)
+				property := v.(*JSONSchemaType)
+				var nestedExistingValues map[string]interface{}
+				if ctx.Name == "" {
+					// This is the root element
+					nestedExistingValues = ctx.ExistingValues
+				} else if v, ok := ctx.ExistingValues[ctx.Name]; ok {
+					var err error
+					nestedExistingValues, err = util.AsMapOfStringsIntefaces(v)
+					if err != nil {
+						return errors.Wrapf(err, "converting key %s from %v to map[string]interface{}", ctx.Name, ctx.ExistingValues)
+					}
+				}
+
+				subContext := SchemaContext{
+					Name:                 n,
+					Prefixes:             ctx.Prefixes,
+					RequiredFields:       ctx.SchemaType.Required,
+					ParentType:           ctx.SchemaType,
+					SchemaType:           property,
+					Output:               result,
+					AdditionalValidators: duringValidators,
+					ExistingValues:       nestedExistingValues,
+					Definitions:          ctx.Definitions,
+					Required:             false,
+				}
+
+				err := o.Recurse(subContext)
+				if err != nil {
+					return err
+				}
+			}
+			valid = true
+			for _, v := range postValidators {
+				err := v(result)
+				if err != nil {
+					str := fmt.Sprintf("Sorry, your reply was invalid: %s", err.Error())
+					_, err1 := o.Out.Write([]byte(str))
+					if err1 != nil {
+						return err1
+					}
+					valid = false
+				}
+			}
+			if valid && len(result.Keys()) > 0 {
+				ctx.Output.Set(ctx.Name, result)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (o *JSONSchemaOptions) RecurseString(ctx SchemaContext) error {
+	validators := []survey.Validator{
+		EnumValidator(ctx.SchemaType.Enum),
+		MinLengthValidator(ctx.SchemaType.MinLength),
+		MaxLengthValidator(ctx.SchemaType.MaxLength),
+		RequiredValidator(ctx.Required),
+		PatternValidator(ctx.SchemaType.Pattern),
+	}
+	// Defined Format validation
+	if ctx.SchemaType.Format != nil {
+		format := util.DereferenceString(ctx.SchemaType.Format)
+		switch format {
+		case "date-time":
+			validators = append(validators, DateTimeValidator())
+		case "date":
+			validators = append(validators, DateValidator())
+		case "time":
+			validators = append(validators, TimeValidator())
+		case "email", "idn-email":
+			validators = append(validators, EmailValidator())
+		case "hostname", "idn-hostname":
+			validators = append(validators, HostnameValidator())
+		case "ipv4":
+			validators = append(validators, Ipv4Validator())
+		case "ipv6":
+			validators = append(validators, Ipv6Validator())
+		case "uri":
+			validators = append(validators, URIValidator())
+		case "uri-reference":
+			validators = append(validators, URIReferenceValidator())
+		case "iri":
+			return fmt.Errorf("iri defined format not supported")
+		case "iri-reference":
+			return fmt.Errorf("iri-reference defined format not supported")
+		case "uri-template":
+			return fmt.Errorf("uri-template defined format not supported")
+		case "json-pointer":
+			validators = append(validators, JSONPointerValidator())
+		case "relative-json-pointer":
+			return fmt.Errorf("relative-json-pointer defined format not supported")
+		case "regex":
+			return fmt.Errorf("regex defined format not supported, use pattern keyword")
+		}
+	}
+
+	subContext := ctx
+	subContext.AdditionalValidators = append(validators, ctx.AdditionalValidators...)
+
+	err := o.handleBasicProperty(subContext, ctx.Required)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *JSONSchemaOptions) RecurseNumber(ctx SchemaContext) error {
+	validators := ctx.AdditionalValidators
+
+	subContext := ctx
+	subContext.AdditionalValidators = numberValidator(ctx.Required, append(validators, FloatValidator()), ctx.SchemaType)
+
+	err := o.handleBasicProperty(ctx, ctx.Required)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *JSONSchemaOptions) RecurseInteger(ctx SchemaContext) error {
+	subContext := ctx
+	subContext.AdditionalValidators = append(ctx.AdditionalValidators, IntegerValidator())
+
+	err := o.handleBasicProperty(ctx, ctx.Required)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *JSONSchemaOptions) RecurseNull(ctx SchemaContext) error {
+	ctx.Output.Set(ctx.Name, nil)
+	return nil
+}
+
+func (o *JSONSchemaOptions) RecurseBoolean(ctx SchemaContext) error {
+	validators := []survey.Validator{
+		EnumValidator(ctx.SchemaType.Enum),
+		RequiredValidator(ctx.Required),
+		BoolValidator(),
+	}
+	ctx.AdditionalValidators = append(validators, ctx.AdditionalValidators...)
+	err := o.handleBasicProperty(ctx, ctx.Required)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *JSONSchemaOptions) handleConditionals(ctx SchemaContext) error {
@@ -179,7 +482,7 @@ func (o *JSONSchemaOptions) processThenElse(result *orderedmap.OrderedMap, condi
 	subContext.SchemaType = conditionalType
 	subContext.Output = result
 
-	err := o.recurse(subContext)
+	err := o.Recurse(subContext)
 	if err != nil {
 		return err
 	}
@@ -194,256 +497,6 @@ func (o *JSONSchemaOptions) processThenElse(result *orderedmap.OrderedMap, condi
 		}
 	}
 	return nil
-}
-
-func (o *JSONSchemaOptions) recurse(ctx SchemaContext) error {
-	required := util.Contains(ctx.RequiredFields, ctx.Name)
-	if ctx.Name != "" {
-		ctx.Prefixes = append(ctx.Prefixes, ctx.Name)
-	}
-	if ctx.SchemaType.ContentEncoding != nil {
-		return fmt.Errorf("contentEncoding is not supported for %s", ctx.Name)
-	}
-	if ctx.SchemaType.ContentMediaType != nil {
-		return fmt.Errorf("contentMediaType is not supported for %s", ctx.Name)
-	}
-
-	if len(ctx.SchemaType.Definitions) > 0 {
-		for key, schema := range ctx.SchemaType.Definitions {
-			(*ctx.Definitions)[key] = schema
-		}
-	}
-
-	if len(ctx.SchemaType.DefinitionsAlias) > 0 {
-		for key, schema := range ctx.SchemaType.DefinitionsAlias {
-			(*ctx.Definitions)[key] = schema
-		}
-	}
-
-	switch ctx.SchemaType.Type {
-	case "null":
-		ctx.Output.Set(ctx.Name, nil)
-	case "boolean":
-		validators := []survey.Validator{
-			EnumValidator(ctx.SchemaType.Enum),
-			RequiredValidator(required),
-			BoolValidator(),
-		}
-		ctx.AdditionalValidators = append(validators, ctx.AdditionalValidators...)
-		err := o.handleBasicProperty(ctx, required)
-		if err != nil {
-			return err
-		}
-	case "object":
-		if len(ctx.SchemaType.PatternProperties) > 0 {
-			return fmt.Errorf("patternProperties is not supported for %s", ctx.Name)
-		}
-		if len(ctx.SchemaType.Dependencies) > 0 {
-			return fmt.Errorf("dependencies is not supported for %s", ctx.Name)
-		}
-		if ctx.SchemaType.PropertyNames != nil {
-			return fmt.Errorf("propertyNames is not supported for %s", ctx.Name)
-		}
-		if ctx.SchemaType.Const != nil {
-			return fmt.Errorf("const is not supported for %s", ctx.Name)
-			// TODO support const
-		}
-		if ctx.SchemaType.Properties != nil {
-			for valid := false; !valid; {
-				result := orderedmap.New()
-				duringValidators := make([]survey.Validator, 0)
-				postValidators := []survey.Validator{
-					// These validators are run after the processing of the properties
-					MinPropertiesValidator(ctx.SchemaType.MinProperties, result, ctx.Name),
-					EnumValidator(ctx.SchemaType.Enum),
-					MaxPropertiesValidator(ctx.SchemaType.MaxProperties, result, ctx.Name),
-				}
-				for _, n := range ctx.SchemaType.Properties.Keys() {
-					v, _ := ctx.SchemaType.Properties.Get(n)
-					property := v.(*JSONSchemaType)
-					var nestedExistingValues map[string]interface{}
-					if ctx.Name == "" {
-						// This is the root element
-						nestedExistingValues = ctx.ExistingValues
-					} else if v, ok := ctx.ExistingValues[ctx.Name]; ok {
-						var err error
-						nestedExistingValues, err = util.AsMapOfStringsIntefaces(v)
-						if err != nil {
-							return errors.Wrapf(err, "converting key %s from %v to map[string]interface{}", ctx.Name, ctx.ExistingValues)
-						}
-					}
-
-					subContext := SchemaContext{
-						Name:                 n,
-						Prefixes:             ctx.Prefixes,
-						RequiredFields:       ctx.SchemaType.Required,
-						ParentType:           ctx.SchemaType,
-						SchemaType:           property,
-						Output:               result,
-						AdditionalValidators: duringValidators,
-						ExistingValues:       nestedExistingValues,
-						Definitions:          ctx.Definitions,
-					}
-
-					err := o.recurse(subContext)
-					if err != nil {
-						return err
-					}
-				}
-				valid = true
-				for _, v := range postValidators {
-					err := v(result)
-					if err != nil {
-						str := fmt.Sprintf("Sorry, your reply was invalid: %s", err.Error())
-						_, err1 := o.Out.Write([]byte(str))
-						if err1 != nil {
-							return err1
-						}
-						valid = false
-					}
-				}
-				if valid && len(result.Keys()) > 0 {
-					ctx.Output.Set(ctx.Name, result)
-				}
-			}
-		}
-	case "array":
-		if ctx.SchemaType.Const != nil {
-			return fmt.Errorf("const is not supported for %s", ctx.Name)
-			// TODO support const
-		}
-		if ctx.SchemaType.Contains != nil {
-			return fmt.Errorf("contains is not supported for %s", ctx.Name)
-			// TODO support contains
-		}
-		if ctx.SchemaType.AdditionalItems != nil {
-			return fmt.Errorf("additionalItems is not supported for %s", ctx.Name)
-			// TODO support additonalItems
-		}
-		err := o.handleArrayProperty(ctx)
-		if err != nil {
-			return err
-		}
-	case "number":
-		validators := ctx.AdditionalValidators
-
-		subContext := ctx
-		subContext.AdditionalValidators = numberValidator(required, append(validators, FloatValidator()), ctx.SchemaType)
-
-		err := o.handleBasicProperty(ctx, required)
-		if err != nil {
-			return err
-		}
-	case "string":
-		validators := []survey.Validator{
-			EnumValidator(ctx.SchemaType.Enum),
-			MinLengthValidator(ctx.SchemaType.MinLength),
-			MaxLengthValidator(ctx.SchemaType.MaxLength),
-			RequiredValidator(required),
-			PatternValidator(ctx.SchemaType.Pattern),
-		}
-		// Defined Format validation
-		if ctx.SchemaType.Format != nil {
-			format := util.DereferenceString(ctx.SchemaType.Format)
-			switch format {
-			case "date-time":
-				validators = append(validators, DateTimeValidator())
-			case "date":
-				validators = append(validators, DateValidator())
-			case "time":
-				validators = append(validators, TimeValidator())
-			case "email", "idn-email":
-				validators = append(validators, EmailValidator())
-			case "hostname", "idn-hostname":
-				validators = append(validators, HostnameValidator())
-			case "ipv4":
-				validators = append(validators, Ipv4Validator())
-			case "ipv6":
-				validators = append(validators, Ipv6Validator())
-			case "uri":
-				validators = append(validators, URIValidator())
-			case "uri-reference":
-				validators = append(validators, URIReferenceValidator())
-			case "iri":
-				return fmt.Errorf("iri defined format not supported")
-			case "iri-reference":
-				return fmt.Errorf("iri-reference defined format not supported")
-			case "uri-template":
-				return fmt.Errorf("uri-template defined format not supported")
-			case "json-pointer":
-				validators = append(validators, JSONPointerValidator())
-			case "relative-json-pointer":
-				return fmt.Errorf("relative-json-pointer defined format not supported")
-			case "regex":
-				return fmt.Errorf("regex defined format not supported, use pattern keyword")
-			}
-		}
-
-		subContext := ctx
-		subContext.AdditionalValidators = append(validators, ctx.AdditionalValidators...)
-
-		err := o.handleBasicProperty(subContext, required)
-		if err != nil {
-			return err
-		}
-	case "integer":
-		subContext := ctx
-		subContext.AdditionalValidators = append(ctx.AdditionalValidators, IntegerValidator())
-
-		err := o.handleBasicProperty(ctx, required)
-		if err != nil {
-			return err
-		}
-	}
-
-	if ctx.SchemaType.Ref != "" {
-		refPath, err := parseRefPath(ctx.SchemaType.Ref)
-		if err != nil {
-			return err
-		}
-
-		currentObject := (*(*ctx.Definitions)[refPath[0]]).(map[string]interface{})
-		for i := 1; i < len(refPath); i += 1 {
-			object, ok := currentObject[refPath[i]]
-			if !ok {
-				return errors.New(fmt.Sprintf("Could not resolve ref path \"%v\" is not a key in the object", refPath[i]))
-			}
-
-			currentObject = object.(map[string]interface{})
-		}
-
-		var mainDefinition *JSONSchemaType
-
-		nestedJSON, err := json.Marshal(currentObject)
-		if err != nil {
-			return errors.New(fmt.Sprintf("Cannot marshal to json object %v", currentObject))
-		}
-
-		err = json.Unmarshal(nestedJSON, &mainDefinition)
-		if err != nil {
-			return errors.New(fmt.Sprintf("Cannot unmarshal json object to JsonSchemaObject %v", nestedJSON))
-		}
-
-		subContext := SchemaContext{
-			Name:                 ctx.Name,
-			Prefixes:             make([]string, 0),
-			RequiredFields:       make([]string, 0),
-			SchemaType:           mainDefinition,
-			ParentType:           nil,
-			Output:               ctx.Output,
-			AdditionalValidators: make([]survey.Validator, 0),
-			ExistingValues:       ctx.ExistingValues,
-			Definitions:          ctx.Definitions,
-		}
-		err = o.recurse(subContext)
-		if err != nil {
-			return err
-		}
-	}
-
-	ctx.RequiredFields = ctx.SchemaType.Required
-	err := o.handleConditionals(ctx)
-	return err
 }
 
 func parseRefPath(path string) ([]string, error) {
