@@ -37,6 +37,7 @@ type JSONSchemaOptions struct {
 	In                  terminal.FileReader
 	Out                 terminal.FileWriter
 	OutErr              io.Writer
+	Overrides           map[string]func(ctx SchemaContext) error
 }
 
 type SchemaContext struct {
@@ -197,6 +198,11 @@ func (o *JSONSchemaOptions) processThenElse(result *orderedmap.OrderedMap, condi
 }
 
 func (o *JSONSchemaOptions) recurse(ctx SchemaContext) error {
+
+	if f, ok := o.Overrides[ctx.Name]; ok {
+		return f(ctx)
+	}
+
 	required := util.Contains(ctx.RequiredFields, ctx.Name)
 	if ctx.Name != "" {
 		ctx.Prefixes = append(ctx.Prefixes, ctx.Name)
