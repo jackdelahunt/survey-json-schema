@@ -283,10 +283,13 @@ func (o *JSONSchemaOptions) RecurseObject(ctx SchemaContext) error {
 					valid = false
 				}
 			}
-			if valid && len(result.Keys()) > 0 {
+			if valid {
 				ctx.Output.Set(ctx.Name, result)
 			}
 		}
+	} else {
+		// if there are no properties then just insert an empty body.. "name": {}
+		ctx.Output.Set(ctx.Name, make(map[string]*JSONSchemaType))
 	}
 
 	return nil
