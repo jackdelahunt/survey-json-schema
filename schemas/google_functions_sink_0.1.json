@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/octet-stream",
+            "description": "The format of the data that Kafka sends to the sink connector.",
             "enum": [
               "application/octet-stream"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -99,28 +100,39 @@
       "type": "object"
     },
     "gcp_function_name": {
-      "description": "The Function Name",
+      "description": "The Function name.",
       "title": "Function Name",
       "type": "string"
     },
     "gcp_project_id": {
-      "description": "The Google Cloud Functions Project Id",
+      "description": "The Google Cloud Functions Project ID.",
       "title": "Project Id",
       "type": "string"
     },
     "gcp_region": {
-      "description": "The Region where the Google Cloud Functions has been deployed",
+      "description": "The region where Google Cloud Functions has been deployed.",
       "title": "Region",
       "type": "string"
     },
     "gcp_service_account_key": {
-      "description": "The Service account key that can be used as credentials for the Google Cloud Functions platform",
+      "oneOf": [
+        {
+          "description": "The path to the service account key file that provides credentials for the Google Cloud Functions platform.",
+          "format": "password",
+          "title": "Service Account Key",
+          "type": "string"
+        },
+        {
+          "additionalProperties": false,
+          "description": "An opaque reference to the aws_access_key",
+          "type": "object"
+        }
+      ],
       "title": "Service Account Key",
-      "type": "string",
       "x-group": "credentials"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
+      "description": "A comma-separated list of Kafka topic names.",
       "title": "Topic Names",
       "type": "string"
     },

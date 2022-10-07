@@ -1,12 +1,12 @@
 {
   "$defs": {
     "data_shape": {
-      "produces": {
+      "consumes": {
         "additionalProperties": false,
         "properties": {
           "format": {
             "default": "application/octet-stream",
-            "description": "The format of the data that the source connector sends to Kafka.",
+            "description": "The format of the data that Kafka sends to the sink connector.",
             "enum": [
               "application/octet-stream"
             ],
@@ -46,11 +46,41 @@
   },
   "additionalProperties": false,
   "properties": {
+    "azure_key": {
+      "oneOf": [
+        {
+          "description": "A function-specific API key is required, if the authLevel of the function is FUNCTION or master key if the authLevel is ADMIN.",
+          "format": "password",
+          "title": "Key",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the azure_key",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Key",
+      "x-group": "credentials"
+    },
+    "azure_method": {
+      "default": "POST",
+      "description": "The HTTP method to use.",
+      "title": "Method",
+      "type": "string"
+    },
+    "azure_url": {
+      "description": "The Azure Functions URL you want to send the data to.",
+      "example": "https://azure-function-demo-12234.azurewebsites.net/api/httpexample",
+      "pattern": "^(https)://.*",
+      "title": "URL",
+      "type": "string"
+    },
     "data_shape": {
       "additionalProperties": false,
       "properties": {
-        "produces": {
-          "$ref": "#/$defs/data_shape/produces"
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
         }
       },
       "type": "object"
@@ -99,62 +129,15 @@
       ],
       "type": "object"
     },
-    "gcp_concurrent_consumers": {
-      "default": 1,
-      "description": "The number of parallel streams to consume from the subscription.",
-      "title": "Concurrent Consumers",
-      "type": "integer"
-    },
-    "gcp_max_messages_per_poll": {
-      "default": 1,
-      "description": "The maximum number of messages to receive from the server in a single API call.",
-      "title": "Max Messages Per Poll",
-      "type": "integer"
-    },
-    "gcp_project_id": {
-      "description": "The Google Cloud Pub/Sub Project ID.",
-      "title": "Project Id",
-      "type": "string"
-    },
-    "gcp_service_account_key": {
-      "oneOf": [
-        {
-          "description": "The service account key to use as credentials for the Pub/Sub publisher/subscriber. You must encode this value in base64.",
-          "format": "password",
-          "title": "Service Account Key",
-          "type": "string"
-        },
-        {
-          "additionalProperties": false,
-          "description": "An opaque reference to the aws_access_key",
-          "type": "object"
-        }
-      ],
-      "title": "Service Account Key",
-      "x-group": "credentials"
-    },
-    "gcp_subscription_name": {
-      "description": "The subscription name.",
-      "title": "Subscription Name",
-      "type": "string"
-    },
-    "gcp_synchronous_pull": {
-      "default": false,
-      "description": "Specifies to synchronously pull batches of messages.",
-      "title": "Synchronous Pull",
-      "type": "boolean"
-    },
     "kafka_topic": {
-      "description": "The name of the Kafka Topic to use.",
-      "title": "Topic Name",
+      "description": "A comma-separated list of Kafka topic names.",
+      "title": "Topic Names",
       "type": "string"
     },
     "processors": {}
   },
   "required": [
-    "gcp_project_id",
-    "gcp_subscription_name",
-    "gcp_service_account_key",
+    "azure_url",
     "kafka_topic"
   ],
   "type": "object"

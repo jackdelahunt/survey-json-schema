@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/json",
+            "description": "The format of the data that Kafka sends to the sink connector.",
             "enum": [
               "application/json"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -55,25 +56,25 @@
       "type": "object"
     },
     "elasticsearch_cluster_name": {
-      "description": "Name of the cluster.",
+      "description": "The name of the ElasticSearch cluster.",
       "example": "quickstart",
       "title": "ElasticSearch Cluster Name",
       "type": "string"
     },
     "elasticsearch_enable_s_s_l": {
       "default": true,
-      "description": "Do we want to connect using SSL?",
+      "description": "Specifies to connect by using SSL.",
       "title": "Enable SSL",
       "type": "boolean"
     },
     "elasticsearch_host_addresses": {
-      "description": "Comma separated list with ip:port formatted remote transport addresses to use.",
+      "description": "A comma-separated list of remote transport addresses in `ip:port format`.",
       "example": "quickstart-es-http:9200",
       "title": "Host Addresses",
       "type": "string"
     },
     "elasticsearch_index_name": {
-      "description": "The name of the index to act against.",
+      "description": "The name of the ElasticSearch index.",
       "example": "data",
       "title": "Index in ElasticSearch",
       "type": "string"
@@ -81,7 +82,7 @@
     "elasticsearch_password": {
       "oneOf": [
         {
-          "description": "Password to connect to ElasticSearch.",
+          "description": "The password to connect to ElasticSearch.",
           "format": "password",
           "title": "Password",
           "type": "string"
@@ -96,7 +97,7 @@
       "x-group": "credentials"
     },
     "elasticsearch_user": {
-      "description": "Username to connect to ElasticSearch.",
+      "description": "The username to connect to ElasticSearch.",
       "title": "Username",
       "type": "string",
       "x-group": "credentials"
@@ -146,7 +147,7 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
+      "description": "A comma-separated list of Kafka topic names.",
       "title": "Topic Names",
       "type": "string"
     },

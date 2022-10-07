@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/octet-stream",
+            "description": "The format of the data that Kafka sends to the sink connector.",
             "enum": [
               "application/octet-stream"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -99,25 +100,25 @@
       "type": "object"
     },
     "jms_artemis_broker_u_r_l": {
-      "description": "The JMS URL",
+      "description": "The JMS URL.",
       "example": "tcp://my-host:61616",
       "title": "Broker URL",
       "type": "string"
     },
     "jms_artemis_destination_name": {
-      "description": "The JMS destination name",
+      "description": "The JMS destination name.",
       "example": "person",
       "title": "Destination Name",
       "type": "string"
     },
     "jms_artemis_destination_type": {
       "default": "queue",
-      "description": "The JMS destination type (i.e.: queue or topic)",
+      "description": "The JMS destination type (queue or topic).",
       "title": "Destination Type",
       "type": "string"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
+      "description": "A comma-separated list of Kafka topic names.",
       "title": "Topic Names",
       "type": "string"
     },

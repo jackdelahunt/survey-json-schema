@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/json",
+            "description": "The format of the data that the source connector sends to Kafka.",
             "enum": [
               "application/json"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -48,7 +49,7 @@
     "azure_blob_access_key": {
       "oneOf": [
         {
-          "description": "The key for Azure Storage Blob service associated with the Blob account name",
+          "description": "The key for the Azure Storage Blob service that is associated with the Storage Blob account name.",
           "format": "password",
           "title": "Azure Storage Blob Access Key",
           "type": "string"
@@ -63,29 +64,29 @@
       "x-group": "credentials"
     },
     "azure_blob_account_name": {
-      "description": "The name of the storage blob account to be use",
+      "description": "The name of the Storage Blob account.",
       "title": "Azure Storage Blob Account Name",
       "type": "string"
     },
     "azure_blob_container_name": {
-      "description": "The name of the storage blob container to be use",
+      "description": "The name of the Storage Blob container.",
       "title": "Azure Storage Blob Container Name",
       "type": "string"
     },
     "azure_eventhub_name": {
-      "description": "The eventhub name",
+      "description": "The Event Hub name.",
       "title": "Eventhubs Name",
       "type": "string"
     },
     "azure_namespace_name": {
-      "description": "The eventhubs namespace",
+      "description": "The Event Hubs namespace.",
       "title": "Eventhubs Namespace",
       "type": "string"
     },
     "azure_shared_access_key": {
       "oneOf": [
         {
-          "description": "The key for EventHubs SAS key name",
+          "description": "The key for the Event Hubs SAS key name.",
           "format": "password",
           "title": "Share Access Key",
           "type": "string"
@@ -100,7 +101,7 @@
       "x-group": "credentials"
     },
     "azure_shared_access_name": {
-      "description": "EventHubs SAS key name",
+      "description": "The Event Hubs SAS key name.",
       "title": "Share Access Name",
       "type": "string",
       "x-group": "credentials"
@@ -159,8 +160,8 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
-      "title": "Topic Names",
+      "description": "The name of the Kafka Topic to use.",
+      "title": "Topic Name",
       "type": "string"
     },
     "processors": {}

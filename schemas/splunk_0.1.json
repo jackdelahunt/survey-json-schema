@@ -1,14 +1,14 @@
 {
   "$defs": {
     "data_shape": {
-      "produces": {
+      "consumes": {
         "additionalProperties": false,
         "properties": {
           "format": {
-            "default": "application/octet-stream",
-            "description": "The format of the data that the source connector sends to Kafka.",
+            "default": "application/json",
+            "description": "The format of the data that Kafka sends to the sink connector.",
             "enum": [
-              "application/octet-stream"
+              "application/json"
             ],
             "type": "string"
           }
@@ -49,8 +49,8 @@
     "data_shape": {
       "additionalProperties": false,
       "properties": {
-        "produces": {
-          "$ref": "#/$defs/data_shape/produces"
+        "consumes": {
+          "$ref": "#/$defs/data_shape/consumes"
         }
       },
       "type": "object"
@@ -99,62 +99,97 @@
       ],
       "type": "object"
     },
-    "gcp_concurrent_consumers": {
-      "default": 1,
-      "description": "The number of parallel streams to consume from the subscription.",
-      "title": "Concurrent Consumers",
-      "type": "integer"
-    },
-    "gcp_max_messages_per_poll": {
-      "default": 1,
-      "description": "The maximum number of messages to receive from the server in a single API call.",
-      "title": "Max Messages Per Poll",
-      "type": "integer"
-    },
-    "gcp_project_id": {
-      "description": "The Google Cloud Pub/Sub Project ID.",
-      "title": "Project Id",
-      "type": "string"
-    },
-    "gcp_service_account_key": {
-      "oneOf": [
-        {
-          "description": "The service account key to use as credentials for the Pub/Sub publisher/subscriber. You must encode this value in base64.",
-          "format": "password",
-          "title": "Service Account Key",
-          "type": "string"
-        },
-        {
-          "additionalProperties": false,
-          "description": "An opaque reference to the aws_access_key",
-          "type": "object"
-        }
-      ],
-      "title": "Service Account Key",
-      "x-group": "credentials"
-    },
-    "gcp_subscription_name": {
-      "description": "The subscription name.",
-      "title": "Subscription Name",
-      "type": "string"
-    },
-    "gcp_synchronous_pull": {
-      "default": false,
-      "description": "Specifies to synchronously pull batches of messages.",
-      "title": "Synchronous Pull",
-      "type": "boolean"
-    },
     "kafka_topic": {
       "description": "The name of the Kafka Topic to use.",
       "title": "Topic Name",
       "type": "string"
     },
-    "processors": {}
+    "processors": {},
+    "splunk_app": {
+      "description": "The app name in Splunk.",
+      "title": "Splunk App",
+      "type": "string"
+    },
+    "splunk_connection_timeout": {
+      "default": 5000,
+      "description": "Timeout in milliseconds when connecting to Splunk server",
+      "title": "Connection Timeout",
+      "type": "integer"
+    },
+    "splunk_index": {
+      "description": "Splunk index to write to.",
+      "title": "Index",
+      "type": "string"
+    },
+    "splunk_mode": {
+      "default": "stream",
+      "description": "The mode to publish events to Splunk.",
+      "enum": [
+        "submit",
+        "stream"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "splunk_password": {
+      "oneOf": [
+        {
+          "description": "The password to authenticate to Splunk Server.",
+          "format": "password",
+          "title": "Password",
+          "type": "string"
+        },
+        {
+          "description": "An opaque reference to the splunk_password",
+          "properties": {},
+          "type": "object"
+        }
+      ],
+      "title": "Password",
+      "x-group": "credentials"
+    },
+    "splunk_protocol": {
+      "default": "https",
+      "description": "Connection Protocol to Splunk server.",
+      "enum": [
+        "http",
+        "https"
+      ],
+      "title": "Protocol",
+      "type": "string"
+    },
+    "splunk_server_hostname": {
+      "description": "The address of your Splunk server.",
+      "example": "my_server_splunk.com",
+      "title": "Splunk Server Address",
+      "type": "string"
+    },
+    "splunk_server_port": {
+      "default": 8089,
+      "description": "The address of your Splunk server.",
+      "title": "Splunk Server Port",
+      "type": "integer"
+    },
+    "splunk_source": {
+      "description": "The source named field of the data.",
+      "title": "Source",
+      "type": "string"
+    },
+    "splunk_source_type": {
+      "description": "The source named field of the data.",
+      "title": "Source Type",
+      "type": "string"
+    },
+    "splunk_username": {
+      "description": "The username to authenticate to Splunk Server.",
+      "title": "Username",
+      "type": "string"
+    }
   },
   "required": [
-    "gcp_project_id",
-    "gcp_subscription_name",
-    "gcp_service_account_key",
+    "splunk_server_hostname",
+    "splunk_username",
+    "splunk_password",
     "kafka_topic"
   ],
   "type": "object"

@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/octet-stream",
+            "description": "The format of the data that Kafka sends to the sink connector.",
             "enum": [
               "application/octet-stream"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -69,43 +70,44 @@
       "type": "string"
     },
     "aws_region": {
-      "description": "The AWS region to connect to.",
+      "description": "The AWS region to access.",
       "enum": [
-        "af-south-1",
-        "ap-east-1",
-        "ap-northeast-1",
-        "ap-northeast-2",
-        "ap-northeast-3",
         "ap-south-1",
-        "ap-southeast-1",
-        "ap-southeast-2",
-        "ap-southeast-3",
+        "eu-south-1",
+        "us-gov-east-1",
+        "me-central-1",
         "ca-central-1",
         "eu-central-1",
-        "eu-north-1",
-        "eu-south-1",
-        "eu-west-1",
-        "eu-west-2",
-        "eu-west-3",
-        "fips-us-east-1",
-        "fips-us-east-2",
-        "fips-us-west-1",
-        "fips-us-west-2",
-        "me-south-1",
-        "sa-east-1",
-        "us-east-1",
-        "us-east-2",
+        "us-iso-west-1",
         "us-west-1",
         "us-west-2",
+        "af-south-1",
+        "eu-north-1",
+        "eu-west-3",
+        "eu-west-2",
+        "eu-west-1",
+        "ap-northeast-3",
+        "ap-northeast-2",
+        "ap-northeast-1",
+        "me-south-1",
+        "sa-east-1",
+        "ap-east-1",
         "cn-north-1",
-        "cn-northwest-1",
-        "us-gov-east-1",
         "us-gov-west-1",
+        "ap-southeast-1",
+        "ap-southeast-2",
         "us-iso-east-1",
-        "us-iso-west-1",
-        "us-isob-east-1"
+        "ap-southeast-3",
+        "us-east-1",
+        "us-east-2",
+        "cn-northwest-1",
+        "us-isob-east-1",
+        "aws-global",
+        "aws-cn-global",
+        "aws-us-gov-global",
+        "aws-iso-global",
+        "aws-iso-b-global"
       ],
-      "example": "eu-west-1",
       "title": "AWS Region",
       "type": "string"
     },
@@ -180,7 +182,7 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
+      "description": "A comma-separated list of Kafka topic names.",
       "title": "Topic Names",
       "type": "string"
     },

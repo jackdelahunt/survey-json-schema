@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/octet-stream",
+            "description": "The format of the data that Kafka sends to the sink connector.",
             "enum": [
               "application/octet-stream"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -100,24 +101,34 @@
     },
     "gcp_auto_create_bucket": {
       "default": false,
-      "description": "Setting the autocreation of the Google Cloud Storage bucket bucketNameOrArn.",
+      "description": "Specifies to automatically create the Google Cloud Storage bucket.",
       "title": "Autocreate Bucket",
       "type": "boolean"
     },
     "gcp_bucket_name_or_arn": {
-      "description": "The Bucket Name or Bucket ARN",
+      "description": "The Google Cloud Storage bucket name or Bucket Amazon Resource Name (ARN).",
       "title": "Bucket Name Or ARN",
       "type": "string"
     },
     "gcp_service_account_key": {
-      "description": "The Service account key that can be used as credentials for the Google Cloud Storage access.",
-      "format": "base64",
+      "oneOf": [
+        {
+          "description": "The service account key to use as credentials for Google Cloud Storage access. You must encode this value in base64.",
+          "format": "password",
+          "title": "Service Account Key",
+          "type": "string"
+        },
+        {
+          "additionalProperties": false,
+          "description": "An opaque reference to the aws_access_key",
+          "type": "object"
+        }
+      ],
       "title": "Service Account Key",
-      "type": "string",
       "x-group": "credentials"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
+      "description": "A comma-separated list of Kafka topic names.",
       "title": "Topic Names",
       "type": "string"
     },

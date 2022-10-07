@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/json",
+            "description": "The format of the data that the source connector sends to Kafka.",
             "enum": [
               "application/json"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -99,32 +100,32 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
-      "title": "Topic Names",
+      "description": "The name of the Kafka Topic to use.",
+      "title": "Topic Name",
       "type": "string"
     },
     "processors": {},
     "sql_consumed_query": {
-      "description": "A query to run on a tuple consumed",
+      "description": "A query to run on a tuple consumed.",
       "example": "DELETE FROM accounts where user_id = :#user_id",
       "title": "Consumed Query",
       "type": "string"
     },
     "sql_database_name": {
-      "description": "The Database Name we are pointing",
+      "description": "The name of the AWS RedShift Database.",
       "title": "Database Name",
       "type": "string"
     },
     "sql_delay": {
       "default": 500,
-      "description": "Milliseconds before the next poll from database",
+      "description": "The number of milliseconds before the next poll from the AWS RedShift database.",
       "title": "Delay",
       "type": "integer"
     },
     "sql_password": {
       "oneOf": [
         {
-          "description": "The password to use for accessing a secured AWS Redshift Database",
+          "description": "The password to access a secured AWS RedShift Database.",
           "format": "password",
           "title": "Password",
           "type": "string"
@@ -139,25 +140,25 @@
       "x-group": "credentials"
     },
     "sql_query": {
-      "description": "The Query to execute against the AWS Redshift Database",
+      "description": "The query to execute against the AWS RedShift Database.",
       "example": "INSERT INTO accounts (username,city) VALUES (:#username,:#city)",
       "title": "Query",
       "type": "string"
     },
     "sql_server_name": {
-      "description": "Server Name for the data source",
+      "description": "The server name for the data source.",
       "example": "localhost",
       "title": "Server Name",
       "type": "string"
     },
     "sql_server_port": {
       "default": 5439,
-      "description": "Server Port for the data source",
+      "description": "The server port for the data source.",
       "title": "Server Port",
       "type": "string"
     },
     "sql_username": {
-      "description": "The username to use for accessing a secured AWS Redshift Database",
+      "description": "The username to access a secured AWS RedShift Database.",
       "title": "Username",
       "type": "string",
       "x-group": "credentials"

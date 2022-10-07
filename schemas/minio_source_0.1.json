@@ -5,9 +5,10 @@
         "additionalProperties": false,
         "properties": {
           "format": {
-            "default": "application/json",
+            "default": "application/octet-stream",
+            "description": "The format of the data that the source connector sends to Kafka.",
             "enum": [
-              "application/json"
+              "application/octet-stream"
             ],
             "type": "string"
           }
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -99,14 +100,14 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
-      "title": "Topic Names",
+      "description": "The name of the Kafka Topic to use.",
+      "title": "Topic Name",
       "type": "string"
     },
     "minio_access_key": {
       "oneOf": [
         {
-          "description": "The access key obtained from Minio",
+          "description": "The access key obtained from MinIO.",
           "format": "password",
           "title": "Access Key",
           "type": "string"
@@ -122,23 +123,23 @@
     },
     "minio_auto_create_bucket": {
       "default": false,
-      "description": "Setting the autocreation of the Minio bucket bucketName.",
+      "description": "Specifies to automatically create the MinIO bucket.",
       "title": "Autocreate Bucket",
       "type": "boolean"
     },
     "minio_bucket_name": {
-      "description": "The Minio Bucket name",
+      "description": "The MinIO Bucket name.",
       "title": "Bucket Name",
       "type": "string"
     },
     "minio_delete_after_read": {
       "default": true,
-      "description": "Delete objects after consuming them",
+      "description": "Delete objects after consuming them.",
       "title": "Auto-delete Objects",
       "type": "boolean"
     },
     "minio_endpoint": {
-      "description": "The Minio Endpoint, it can be an URL, domain name, IPv4 address or IPv6 address.",
+      "description": "The MinIO Endpoint. You can specify an URL, domain name, IPv4 address, or IPv6 address.",
       "example": "http://localhost:9000",
       "title": "Endpoint",
       "type": "string"
@@ -146,7 +147,7 @@
     "minio_secret_key": {
       "oneOf": [
         {
-          "description": "The secret key obtained from Minio",
+          "description": "The secret key obtained from MinIO.",
           "format": "password",
           "title": "Secret Key",
           "type": "string"

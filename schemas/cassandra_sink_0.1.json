@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/json",
+            "description": "The format of the data that Kafka sends to the sink connector.",
             "enum": [
               "application/json"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -46,25 +47,25 @@
   "additionalProperties": false,
   "properties": {
     "cassandra_connection_host": {
-      "description": "Hostname(s) cassandra server(s). Multiple hosts can be separated by comma.",
+      "description": "The hostname(s) for the Cassandra server(s). Use a comma to separate multiple hostnames.",
       "example": "localhost",
       "title": "Connection Host",
       "type": "string"
     },
     "cassandra_connection_port": {
-      "description": "Port number of cassandra server(s)",
+      "description": "The port number(s) of the cassandra server(s). Use a comma to separate multiple port numbers.",
       "example": 9042,
       "title": "Connection Port",
       "type": "string"
     },
     "cassandra_consistency_level": {
       "default": "ANY",
-      "description": "Consistency level to use. The value can be one of ANY, ONE, TWO, THREE, QUORUM, ALL, LOCAL_QUORUM, EACH_QUORUM, SERIAL, LOCAL_SERIAL, LOCAL_ONE",
+      "description": "The consistency level to use. Set the value to one of these options - ANY, ONE, TWO, THREE, QUORUM, ALL, LOCAL_QUORUM, EACH_QUORUM, SERIAL, LOCAL_SERIAL, or LOCAL_ONE.",
       "title": "Consistency Level",
       "type": "string"
     },
     "cassandra_keyspace": {
-      "description": "Keyspace to use",
+      "description": "The keyspace to use.",
       "example": "customers",
       "title": "Keyspace",
       "type": "string"
@@ -72,7 +73,7 @@
     "cassandra_password": {
       "oneOf": [
         {
-          "description": "The password to use for accessing a secured Cassandra Cluster",
+          "description": "The password for accessing a secured Cassandra cluster.",
           "format": "password",
           "title": "Password",
           "type": "string"
@@ -88,17 +89,17 @@
     },
     "cassandra_prepare_statements": {
       "default": true,
-      "description": "Whether to use PreparedStatements or regular Statements as the query.",
+      "description": "If true, specifies to use PreparedStatements as the query. If false, specifies to use regular Statements as the query.",
       "title": "Prepare Statements",
       "type": "boolean"
     },
     "cassandra_query": {
-      "description": "The query to execute against the Cassandra cluster table",
+      "description": "The query to execute against the Cassandra cluster table.",
       "title": "Query",
       "type": "string"
     },
     "cassandra_username": {
-      "description": "The username to use for accessing a secured Cassandra Cluster",
+      "description": "The username for accessing a secured Cassandra cluster.",
       "title": "Username",
       "type": "string",
       "x-group": "credentials"
@@ -157,7 +158,7 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
+      "description": "A comma-separated list of Kafka topic names.",
       "title": "Topic Names",
       "type": "string"
     },

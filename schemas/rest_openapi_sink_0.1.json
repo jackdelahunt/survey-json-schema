@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/octet-stream",
+            "description": "The format of the data that Kafka sends to the sink connector.",
             "enum": [
               "application/octet-stream"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -99,18 +100,18 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
+      "description": "A comma-separated list of Kafka topic names.",
       "title": "Topic Names",
       "type": "string"
     },
     "processors": {},
     "rest_openapi_operation": {
-      "description": "The operation to call",
+      "description": "The operation to call.",
       "title": "Operation ID",
       "type": "string"
     },
     "rest_openapi_specification": {
-      "description": "URI to the OpenApi specification file",
+      "description": "The URI to the OpenApi specification file.",
       "example": "https://api.example.com/openapi.json",
       "pattern": "^(http|https|file|classpath)://.*",
       "title": "Specification URI",

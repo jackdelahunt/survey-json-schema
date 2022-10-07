@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/octet-stream",
+            "description": "The format of the data that the source connector sends to Kafka.",
             "enum": [
               "application/octet-stream"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -48,7 +49,7 @@
     "aws_access_key": {
       "oneOf": [
         {
-          "description": "The access key obtained from AWS",
+          "description": "The access key obtained from AWS.",
           "format": "password",
           "title": "Access Key",
           "type": "string"
@@ -64,96 +65,97 @@
     },
     "aws_auto_create_bucket": {
       "default": false,
-      "description": "Setting the autocreation of the S3 bucket bucketName.",
+      "description": "Specifies to automatically create the S3 bucket.",
       "title": "Autocreate Bucket",
       "type": "boolean"
     },
     "aws_bucket_name_or_arn": {
-      "description": "The S3 Bucket name or ARN",
+      "description": "The S3 Bucket name or Amazon Resource Name (ARN).",
       "title": "Bucket Name",
       "type": "string"
     },
     "aws_delay": {
       "default": 500,
-      "description": "Milliseconds before the next poll of the selected bucket",
+      "description": "The number of milliseconds before the next poll of the selected bucket.",
       "title": "Delay",
       "type": "integer"
     },
     "aws_delete_after_read": {
       "default": true,
-      "description": "Delete objects after consuming them",
+      "description": "Specifies to delete objects after consuming them.",
       "title": "Auto-delete Objects",
       "type": "boolean"
     },
     "aws_ignore_body": {
       "default": false,
-      "description": "If it is true, the S3 Object Body will be ignored completely, if it is set to false the S3 Object will be put in the body. Setting this to true, will override any behavior defined by includeBody option.",
+      "description": "If true, the S3 Object body is ignored. Setting this to true overrides any behavior defined by the `includeBody` option. If false, the S3 object is put in the body.",
       "title": "Ignore Body",
       "type": "boolean"
     },
     "aws_include_body": {
       "default": true,
-      "description": "If it is true, the exchange will be consumed and put into the body and closed. If false the S3Object stream will be put raw into the body and the headers will be set with the S3 object metadata.",
+      "description": "If true, the exchange is consumed and put into the body and closed. If false, the S3Object stream is put raw into the body and the headers are set with the S3 object metadata.",
       "title": "Include Body",
       "type": "boolean"
     },
     "aws_override_endpoint": {
       "default": false,
-      "description": "Set the need for overiding the endpoint URI. This option needs to be used in combination with uriEndpointOverride setting.",
+      "description": "Select this option to override the endpoint URI. To use this option, you must also provide a URI for the `uriEndpointOverride` option.",
       "title": "Endpoint Overwrite",
       "type": "boolean"
     },
     "aws_prefix": {
-      "description": "The AWS S3 bucket prefix to consider while searching",
+      "description": "The AWS S3 bucket prefix to consider while searching.",
       "example": "folder/",
       "title": "Prefix",
       "type": "string"
     },
     "aws_region": {
-      "description": "The AWS region to connect to",
+      "description": "The AWS region to access.",
       "enum": [
-        "af-south-1",
-        "ap-east-1",
-        "ap-northeast-1",
-        "ap-northeast-2",
-        "ap-northeast-3",
         "ap-south-1",
-        "ap-southeast-1",
-        "ap-southeast-2",
-        "ap-southeast-3",
+        "eu-south-1",
+        "us-gov-east-1",
+        "me-central-1",
         "ca-central-1",
         "eu-central-1",
-        "eu-north-1",
-        "eu-south-1",
-        "eu-west-1",
-        "eu-west-2",
-        "eu-west-3",
-        "fips-us-east-1",
-        "fips-us-east-2",
-        "fips-us-west-1",
-        "fips-us-west-2",
-        "me-south-1",
-        "sa-east-1",
-        "us-east-1",
-        "us-east-2",
+        "us-iso-west-1",
         "us-west-1",
         "us-west-2",
+        "af-south-1",
+        "eu-north-1",
+        "eu-west-3",
+        "eu-west-2",
+        "eu-west-1",
+        "ap-northeast-3",
+        "ap-northeast-2",
+        "ap-northeast-1",
+        "me-south-1",
+        "sa-east-1",
+        "ap-east-1",
         "cn-north-1",
-        "cn-northwest-1",
-        "us-gov-east-1",
         "us-gov-west-1",
+        "ap-southeast-1",
+        "ap-southeast-2",
         "us-iso-east-1",
-        "us-iso-west-1",
-        "us-isob-east-1"
+        "ap-southeast-3",
+        "us-east-1",
+        "us-east-2",
+        "cn-northwest-1",
+        "us-isob-east-1",
+        "aws-global",
+        "aws-cn-global",
+        "aws-us-gov-global",
+        "aws-iso-global",
+        "aws-iso-b-global"
       ],
-      "example": "eu-west-1",
       "title": "AWS Region",
       "type": "string"
     },
     "aws_secret_key": {
       "oneOf": [
         {
-          "description": "The secret key obtained from AWS",
+          "description": "The secret key obtained from AWS.",
           "format": "password",
           "title": "Secret Key",
           "type": "string"
@@ -168,7 +170,7 @@
       "x-group": "credentials"
     },
     "aws_uri_endpoint_override": {
-      "description": "Set the overriding endpoint URI. This option needs to be used in combination with overrideEndpoint option.",
+      "description": "The overriding endpoint URI. To use this option, you must also select the `overrideEndpoint` option.",
       "title": "Overwrite Endpoint URI",
       "type": "string"
     },
@@ -226,8 +228,8 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
-      "title": "Topic Names",
+      "description": "The name of the Kafka Topic to use.",
+      "title": "Topic Name",
       "type": "string"
     },
     "processors": {}

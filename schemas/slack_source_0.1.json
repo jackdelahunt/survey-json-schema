@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/json",
+            "description": "The format of the data that the source connector sends to Kafka.",
             "enum": [
               "application/json"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -99,19 +100,19 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
-      "title": "Topic Names",
+      "description": "The name of the Kafka Topic to use.",
+      "title": "Topic Name",
       "type": "string"
     },
     "processors": {},
     "slack_channel": {
-      "description": "The Slack channel to receive messages from",
+      "description": "The Slack channel to receive messages from.",
       "example": "#myroom",
       "title": "Channel",
       "type": "string"
     },
     "slack_delay": {
-      "description": "The delay between polls",
+      "description": "The delay between polls.",
       "example": "1s",
       "title": "Delay",
       "type": "string"
@@ -119,7 +120,7 @@
     "slack_token": {
       "oneOf": [
         {
-          "description": "The token to access Slack. A Slack app is needed. This app needs to have channels:history and channels:read permissions. The Bot User OAuth Access Token is the kind of token needed.",
+          "description": "The Bot User OAuth Access Token to access Slack. A Slack app that has the following permissions is required: `channels:history`, `groups:history`, `im:history`, `mpim:history`, `channels:read`, `groups:read`, `im:read`, and `mpim:read`.",
           "format": "password",
           "title": "Token",
           "type": "string"

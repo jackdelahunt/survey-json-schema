@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/octet-stream",
+            "description": "The format of the data that the source connector sends to Kafka.",
             "enum": [
               "application/octet-stream"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -99,43 +100,49 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
-      "title": "Topic Names",
+      "description": "The name of the Kafka Topic to use.",
+      "title": "Topic Name",
       "type": "string"
     },
     "processors": {},
     "sftp_connection_host": {
-      "description": "Hostname of the SFTP server",
+      "description": "The hostname of the SFTP server.",
       "title": "Connection Host",
       "type": "string"
     },
     "sftp_connection_port": {
       "default": 22,
-      "description": "Port of the FTP server",
+      "description": "The port of the FTP server.",
       "title": "Connection Port",
       "type": "string"
     },
     "sftp_directory_name": {
-      "description": "The starting directory",
+      "description": "The starting directory.",
       "title": "Directory Name",
       "type": "string"
     },
     "sftp_idempotent": {
       "default": true,
-      "description": "Skip already processed files.",
+      "description": "Skip already-processed files.",
       "title": "Idempotency",
+      "type": "boolean"
+    },
+    "sftp_ignore_file_not_found_or_permission_error": {
+      "default": false,
+      "description": "Whether to ignore when (trying to list files in directories or when downloading a file), which does not exist or due to permission error. By default when a directory or file does not exists or insufficient permission, then an exception is thrown. Setting this option to true allows to ignore that instead.",
+      "title": "Ignore File Not Found Or Permission Error",
       "type": "boolean"
     },
     "sftp_passive_mode": {
       "default": false,
-      "description": "Sets passive mode connection",
+      "description": "Sets the passive mode connection.",
       "title": "Passive Mode",
       "type": "boolean"
     },
     "sftp_password": {
       "oneOf": [
         {
-          "description": "The password to access the SFTP server",
+          "description": "The password to access the SFTP server.",
           "format": "password",
           "title": "Password",
           "type": "string"
@@ -151,12 +158,12 @@
     },
     "sftp_recursive": {
       "default": false,
-      "description": "If a directory, will look for files in all the sub-directories as well.",
+      "description": "If a directory, look for files in all sub-directories as well.",
       "title": "Recursive",
       "type": "boolean"
     },
     "sftp_username": {
-      "description": "The username to access the SFTP server",
+      "description": "The username to access the SFTP server.",
       "title": "Username",
       "type": "string",
       "x-group": "credentials"

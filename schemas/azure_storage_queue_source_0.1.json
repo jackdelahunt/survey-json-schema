@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/octet-stream",
+            "description": "The format of the data that the source connector sends to Kafka.",
             "enum": [
               "application/octet-stream"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -48,7 +49,7 @@
     "azure_access_key": {
       "oneOf": [
         {
-          "description": "The Azure Storage Queue access Key.",
+          "description": "The Azure Storage Queue access key.",
           "format": "password",
           "title": "Access Key",
           "type": "string"
@@ -70,7 +71,7 @@
     },
     "azure_max_messages": {
       "default": 1,
-      "description": "Maximum number of messages to get, if there are less messages exist in the queue than requested all the messages will be returned. By default it will consider 1 message to be retrieved, the allowed range is 1 to 32 messages.",
+      "description": "The maximum number of messages to get. You can specify a value between 1 and 32. The default is 1 (one message). If there are fewer than the maximum number of messages in the queue, then all the messages are returned.",
       "title": "Maximum Messages",
       "type": "integer"
     },
@@ -133,8 +134,8 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
-      "title": "Topic Names",
+      "description": "The name of the Kafka Topic to use.",
+      "title": "Topic Name",
       "type": "string"
     },
     "processors": {}

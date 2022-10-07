@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/json",
+            "description": "The format of the data that Kafka sends to the sink connector.",
             "enum": [
               "application/json"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -55,14 +56,14 @@
       "type": "object"
     },
     "db_database_name": {
-      "description": "The Database Name we are pointing",
+      "description": "The name of the MySQL Database.",
       "title": "Database Name",
       "type": "string"
     },
     "db_password": {
       "oneOf": [
         {
-          "description": "The password to use for accessing a secured MySQL Database",
+          "description": "The password to access a secured MySQL Database.",
           "format": "password",
           "title": "Password",
           "type": "string"
@@ -77,25 +78,25 @@
       "x-group": "credentials"
     },
     "db_query": {
-      "description": "The Query to execute against the MySQL Database",
+      "description": "The query to execute against the MySQL Database.",
       "example": "INSERT INTO accounts (username,city) VALUES (:#username,:#city)",
       "title": "Query",
       "type": "string"
     },
     "db_server_name": {
-      "description": "Server Name for the data source",
+      "description": "The server name for the data source.",
       "example": "localhost",
       "title": "Server Name",
       "type": "string"
     },
     "db_server_port": {
       "default": 3306,
-      "description": "Server Port for the data source",
+      "description": "The server port for the data source.",
       "title": "Server Port",
       "type": "string"
     },
     "db_username": {
-      "description": "The username to use for accessing a secured MySQL Database",
+      "description": "The username to access a secured MySQL Database.",
       "title": "Username",
       "type": "string",
       "x-group": "credentials"
@@ -145,7 +146,7 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
+      "description": "A comma-separated list of Kafka topic names.",
       "title": "Topic Names",
       "type": "string"
     },

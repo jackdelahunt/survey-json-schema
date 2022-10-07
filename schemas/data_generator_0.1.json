@@ -6,6 +6,7 @@
         "properties": {
           "format": {
             "default": "application/octet-stream",
+            "description": "The format of the data that the source connector sends to Kafka.",
             "enum": [
               "application/octet-stream"
             ],
@@ -23,7 +24,7 @@
         "additionalProperties": false,
         "properties": {
           "topic": {
-            "description": "The name of the Kafka topic used as dead letter queue",
+            "description": "The name of the Kafka topic that serves as a destination for messages which were not processed correctly due to an error.",
             "title": "Dead Letter Topic Name",
             "type": "string"
           }
@@ -99,26 +100,26 @@
       "type": "object"
     },
     "kafka_topic": {
-      "description": "Comma separated list of Kafka topic names",
-      "title": "Topic Names",
+      "description": "The name of the Kafka Topic to use.",
+      "title": "Topic Name",
       "type": "string"
     },
     "processors": {},
     "timer_content_type": {
       "default": "text/plain",
-      "description": "The content type of the message being generated",
+      "description": "The content type of the generated message.",
       "title": "Content Type",
       "type": "string"
     },
     "timer_message": {
-      "description": "The message to generate",
+      "description": "The message to generate.",
       "example": "hello world",
       "title": "Message",
       "type": "string"
     },
     "timer_period": {
       "default": 1000,
-      "description": "The interval between two events in milliseconds",
+      "description": "The interval (in milliseconds) to wait between producing the next message.",
       "title": "Period",
       "type": "integer"
     }
